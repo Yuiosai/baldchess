@@ -1,12 +1,16 @@
 // BaldChess UI: English and Russian, responsive boards, draggable vector pieces.
 (()=>{
  const $=id=>document.getElementById(id);
+ // Transitional DOM safety: an older cached page or script should not break room creation.
+ const setHidden=(id,value)=>{const node=$(id);if(node)node.hidden=Boolean(value);};
  const LANG={
  en:{pickMode:'Choose your battlefield',duel:'1 VS 1',four:'4 PLAYERS',duelDesc:'Classic 8 × 8 board · 2 players',fourDesc:'Cross-shaped 14 × 14 board',language:'Language',tagline:'MULTIPLAYER CHESS',joinCode:'Join with room code',newLobby:'+ New lobby',createOrJoin:'Create a lobby or join using a code',turnNow:'TO MOVE',players:'Players',lobby:'Lobby',invite:'Share this code with your friends.',copyLink:'Copy invite link',editLobby:'⚙ Edit lobby settings',piecesDesign:'Piece designs',mySkin:'My pieces (visible to everyone)',myColor:'My piece color',uniform:'Show all pieces in one style (only for me)',history:'Move history',resign:'Resign',rematch:'↻ Rematch',noAccounts:'No accounts or registration. Your seat is saved in this browser. If someone disconnects, the host can play for them.',joinRoom:'Join a lobby',enterCode:'Enter the 6-character room code and your nickname.',code:'Room code',nickname:'Nickname',join:'Join',setup:'Starting position',classic:'Classic',fischer:'Fischer random',custom:'Custom board',format:'Game format',teams:'Teams',minutes:'Time per player',unlimited:'Unlimited',increment:'Time increment',noIncrement:'None',allowPremoves:'Allow premoves',differentClocks:'Different time for each player',teamsHelp:'Allies cannot capture each other. Last surviving team wins.',boardEditor:'Board editor',oneKing:'Exactly one king per color',color:'Color',piece:'Piece',restore:'Restore default',clear:'Clear',createLobby:'Create lobby',promotion:'Pawn promotion',choosePiece:'Choose a piece:',queen:'♛ Queen',rook:'♜ Rook',bishop:'♝ Bishop',knight:'♞ Knight',cancel:'Cancel',red:'Red',blue:'Blue',yellow:'Yellow',green:'Green',king:'King',pawn:'Pawn',erase:'Eraser',save:'Save settings',settings:'Room settings',waiting:'Waiting for players',ready:'Your turn',opponent:'Waiting for opponent',check:'Check! Protect your king',premoveAllowed:'You can make a premove',premoveSaved:'Premove queued. It will execute when your turn begins, if still legal.',finished:'Game over',win:'Winner',draw:'Draw',notConnected:'Not connected',disconnected:'Offline',connected:'Online',eliminated:'Eliminated',you:'You',controlling:'Host controlling',takeover:'Take control',release:'Release control',takeoverHint:'Host takeover available after 12 seconds offline.',room:'Room',inviteOthers:'Invite the remaining players',copy:'Copied!',moves:'Moves',entries:'entries',noMoves:'Moves will appear here',start:'All players joined. Game started!',castle:'castling',capture:'capture',checkmate:'checkmate',stalemate:'stalemate',timeout:'time ran out',resigned:'resigned',premovesOn:'premoves on',premovesOff:'no premoves',noClock:'no clock',individual:'individual clocks',classicSetup:'Classic',fischerSetup:'Fischer',customSetup:'Custom',ffa:'Free-for-All',teamsMode:'Teams',lobbyPhase:'Lobby',playingPhase:'Playing',endPhase:'Finished',confirmRematch:'Restart this game with the same settings?',confirmResign:'Resign this game?',enterValidCode:'Enter a valid 6-character code.',needTeams:'Choose at least two teams.',needKings:'Exactly one king required for:',selectSkin:'Choose a style',noControl:'You cannot control this color.',error:'Error',spectator:'Spectator',minute:'min',waitSlots:'Waiting',dragon:'Dragon Realm',fortress:'Iron Citadel',cosmos:'Cosmic',mystic:'Arcane',pixel:'Pixel Heroes',skinClassic:'Classic',copyPrompt:'Copy this link:',host:'Host',oneVsOne:'1 VS 1',fourPlayers:'4 PLAYERS',noMovesHint:'Click or drag a piece to move.',stay:'A returning player regains their pieces automatically.'},
  ru:{pickMode:'Выбери режим игры',duel:'1 НА 1',four:'4 ИГРОКА',duelDesc:'Обычная доска 8 × 8 · 2 игрока',fourDesc:'Крестообразная доска 14 × 14',language:'Язык',tagline:'СЕТЕВЫЕ ШАХМАТЫ',joinCode:'Войти по коду комнаты',newLobby:'+ Новое лобби',createOrJoin:'Создай комнату или войди по коду',turnNow:'СЕЙЧАС ХОДЯТ',players:'Игроки',lobby:'Лобби',invite:'Отправь код друзьям.',copyLink:'Скопировать ссылку',editLobby:'⚙ Настройки лобби',piecesDesign:'Стили фигур',mySkin:'Мои фигуры (видны всем)',myColor:'Цвет моих фигур',uniform:'Показывать все фигуры в одном стиле (только у меня)',history:'История ходов',resign:'Сдаться',rematch:'↻ Новая партия',noAccounts:'Без аккаунтов и регистрации. Место сохраняется в этом браузере. За отключившихся игроков может играть хост.',joinRoom:'Войти в лобби',enterCode:'Введи шестизначный код комнаты и своё имя.',code:'Код комнаты',nickname:'Имя игрока',join:'Войти',setup:'Расстановка',classic:'Классическая',fischer:'Фишер (случайная)',custom:'Своя расстановка',format:'Формат',teams:'Команды',minutes:'Время на игрока',unlimited:'Без ограничений',increment:'Прибавка за ход',noIncrement:'Без прибавки',allowPremoves:'Разрешить премувы',differentClocks:'Разное время для игроков',teamsHelp:'Союзники не бьют друг друга. Побеждает последняя оставшаяся команда.',boardEditor:'Редактор расстановки',oneKing:'Ровно один король каждого цвета',color:'Цвет',piece:'Фигура',restore:'Стандартная',clear:'Очистить',createLobby:'Создать лобби',promotion:'Превращение пешки',choosePiece:'Выбери фигуру:',queen:'♛ Ферзь',rook:'♜ Ладья',bishop:'♝ Слон',knight:'♞ Конь',cancel:'Отмена',red:'Красные',blue:'Синие',yellow:'Жёлтые',green:'Зелёные',king:'Король',pawn:'Пешка',erase:'Ластик',save:'Сохранить настройки',settings:'Настройки комнаты',waiting:'Ожидание игроков',ready:'Твой ход',opponent:'Ожидание соперника',check:'Шах! Защити короля',premoveAllowed:'Можно поставить премув',premoveSaved:'Премув записан. Он выполнится в твой ход, если останется допустимым.',finished:'Партия завершена',win:'Победа',draw:'Ничья',notConnected:'Не подключён',disconnected:'Не в сети',connected:'В игре',eliminated:'Выбыл',you:'Ты',controlling:'Управляет хост',takeover:'Взять управление',release:'Вернуть управление',takeoverHint:'Хост может взять чужой цвет после 12 секунд отсутствия игрока.',room:'Комната',inviteOthers:'Пригласи остальных',copy:'Скопировано!',moves:'Ходов',entries:'записей',noMoves:'Здесь появятся ходы',start:'Все игроки подключились. Партия началась!',castle:'рокировка',capture:'взятие',checkmate:'мат',stalemate:'пат',timeout:'время вышло',resigned:'сдался',premovesOn:'премувы включены',premovesOff:'без премувов',noClock:'без часов',individual:'индивидуальные часы',classicSetup:'Классика',fischerSetup:'Фишер',customSetup:'Своя доска',ffa:'Free-for-All',teamsMode:'Команды',lobbyPhase:'Лобби',playingPhase:'Игра',endPhase:'Завершена',confirmRematch:'Начать новую партию с теми же настройками?',confirmResign:'Сдаться и выбыть из партии?',enterValidCode:'Введите правильный шестизначный код.',needTeams:'Нужно минимум две разные команды.',needKings:'Нужен ровно один король цвета:',selectSkin:'Выбери стиль',noControl:'Нельзя управлять этим цветом.',error:'Ошибка',spectator:'Зритель',minute:'мин',waitSlots:'Ожидание',dragon:'Драконье королевство',fortress:'Железная крепость',cosmos:'Космос',mystic:'Магия',pixel:'Пиксельные герои',skinClassic:'Классика',copyPrompt:'Скопируй ссылку:',host:'Хост',oneVsOne:'1 НА 1',fourPlayers:'4 ИГРОКА',noMovesHint:'Выбери или перетащи фигуру.',stay:'Вернувшийся игрок автоматически получит свой цвет обратно.'}
  };
  Object.assign(LANG.en,{welcomeMotto:'YOUR BOARD. YOUR RULES.',online:'ONLINE',backToGame:'Back to current game',copyCode:'Copy room code',team:'Team',joinHint:'Use this room code to connect.',invalidSkin:'Invalid skin',player:'Player',second:'sec',teamsHeader:'TEAMS · 4 PLAYERS',freeForAllHeader:'FREE FOR ALL · 4 PLAYERS',footer:'ONLINE · CHESS',sendInvite:'Invite link copied',seatTop:'Top',seatBottom:'Bottom',seatLeft:'Left',seatRight:'Right'});
  Object.assign(LANG.ru,{welcomeMotto:'ТВОЯ ДОСКА. ТВОИ ПРАВИЛА.',online:'В СЕТИ',backToGame:'Вернуться к текущей партии',copyCode:'Скопировать код комнаты',team:'Команда',joinHint:'Используй этот код для входа.',invalidSkin:'Неверный скин',player:'Игрок',second:'сек',teamsHeader:'КОМАНДЫ · 4 ИГРОКА',freeForAllHeader:'FREE FOR ALL · 4 ИГРОКА',footer:'СЕТЕВЫЕ ШАХМАТЫ',sendInvite:'Ссылка-приглашение скопирована',seatTop:'Верх',seatBottom:'Низ',seatLeft:'Слева',seatRight:'Справа'});
+ Object.assign(LANG.en,{playSounds:'Move sounds'});
+ Object.assign(LANG.ru,{playSounds:'Звуки ходов'});
  Object.assign(LANG.en,{customize:'Customize Board',displayOptions:'Display',showPlayerSkins:'Show other players’ skins',showPlayerHelp:'Switch off to see the entire board and every piece in your own style. Other players will not be affected.',palettes:'Color Palettes',artSkins:'Art Skins',appearanceExplain:'Both choices change board colors and the pieces together. With player skins enabled, friends see your territory and your figures in this style.',livePreview:'Preview',applyAppearance:'Apply appearance'});
  Object.assign(LANG.ru,{customize:'Кастомизация доски',displayOptions:'Отображение',showPlayerSkins:'Показывать скины других игроков',showPlayerHelp:'Выключи, чтобы вся доска и все фигуры отображались в твоём оформлении. У других игроков ничего не изменится.',palettes:'Цветовые палитры',artSkins:'Художественные скины',appearanceExplain:'И палитры, и скины меняют вместе доску, цвета и фигуры. При включённом отображении другие игроки увидят твою область доски и твои фигуры.',livePreview:'Предпросмотр',applyAppearance:'Применить оформление'});
  let language='en',chosenMode='four',showWelcome=true,editing=false,showPlayerThemes=true,chosenAppearance='palette:classic',cells=[],editorCells=[],boardSize=0,editorSize=0,toastTimer,editor={board:ChessBoard.startBoard()};
@@ -44,68 +48,89 @@
   const closed=()=>finish('Q');d.addEventListener('click',pick);d.addEventListener('close',closed);d.showModal();
  })};
 
+ // Shared, original wooden chess-click sound. Same for every palette and art skin.
  const ChessAudio=(()=>{
-  let ctx=null,noiseBuffer=null;
+  let context=null,buffer=null;
+  let enabled=load('baldchess_sound','true')!=='false';
   const AudioCtor=window.AudioContext||window.webkitAudioContext;
-  const enable=()=>{if(!AudioCtor)return null;ctx??=new AudioCtor();if(ctx.state==='suspended')ctx.resume().catch(()=>{});if(!noiseBuffer&&ctx){noiseBuffer=ctx.createBuffer(1,ctx.sampleRate*.18,ctx.sampleRate);const d=noiseBuffer.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);}return ctx;};
-  const unlock=()=>enable();
-  window.addEventListener('pointerdown',unlock,{passive:true});
-  window.addEventListener('keydown',unlock);
-  function env(gain,time,peak=.16,attack=.005,decay=.12){
-   gain.gain.cancelScheduledValues(time);
-   gain.gain.setValueAtTime(0.0001,time);
-   gain.gain.linearRampToValueAtTime(peak,time+attack);
-   gain.gain.exponentialRampToValueAtTime(0.0001,time+Math.max(attack+.02,decay));
+  function unlock(){
+   if(!AudioCtor||!enabled)return null;
+   if(!context)context=new AudioCtor();
+   if(context.state==='suspended')context.resume().catch(()=>{});
+   if(!buffer){
+    buffer=context.createBuffer(1,Math.round(context.sampleRate*.17),context.sampleRate);
+    const data=buffer.getChannelData(0);
+    // Soft damped tap rather than digital beeps or themed sound effects.
+    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-27*i/data.length);
+   }
+   return context;
   }
-  function tone(opts={}){
-   const ac=enable(); if(!ac) return;
-   const now=ac.currentTime+(opts.delay||0),osc=ac.createOscillator(),gain=ac.createGain(),filter=ac.createBiquadFilter();
-   osc.type=opts.type||'triangle';
-   osc.frequency.setValueAtTime(opts.freq||330,now);
-   if(opts.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(40,opts.slide),now+(opts.duration||0.12));
-   filter.type=opts.filterType||'lowpass'; filter.frequency.value=opts.filter||2200; filter.Q.value=opts.q||0.2;
-   env(gain,now,opts.gain||.12,opts.attack||.003,opts.duration||.12);
-   osc.connect(filter); filter.connect(gain); gain.connect(ac.destination);
-   osc.start(now); osc.stop(now+(opts.duration||.12)+.03);
+  window.addEventListener('pointerdown',()=>{if(enabled)unlock();},{passive:true});
+  window.addEventListener('keydown',()=>{if(enabled)unlock();});
+  function tap(at,level=1,pitch=1){
+   const ac=unlock();if(!ac)return;
+   const hiss=ac.createBufferSource(),band=ac.createBiquadFilter(),amp=ac.createGain();
+   hiss.buffer=buffer;
+   band.type='lowpass';band.frequency.value=1180*pitch;band.Q.value=.4;
+   amp.gain.setValueAtTime(.0001,at);
+   amp.gain.linearRampToValueAtTime(.125*level,at+.003);
+   amp.gain.exponentialRampToValueAtTime(.0001,at+.063);
+   hiss.connect(band);band.connect(amp);amp.connect(ac.destination);
+   hiss.start(at);hiss.stop(at+.075);
+   const osc=ac.createOscillator(),body=ac.createGain();
+   osc.type='sine';osc.frequency.setValueAtTime(225*pitch,at);
+   osc.frequency.exponentialRampToValueAtTime(95*pitch,at+.06);
+   body.gain.setValueAtTime(.0001,at);
+   body.gain.linearRampToValueAtTime(.04*level,at+.002);
+   body.gain.exponentialRampToValueAtTime(.0001,at+.075);
+   osc.connect(body);body.connect(ac.destination);
+   osc.start(at);osc.stop(at+.085);
   }
-  function noise(opts={}){
-   const ac=enable(); if(!ac||!noiseBuffer) return;
-   const now=ac.currentTime+(opts.delay||0),src=ac.createBufferSource(),filter=ac.createBiquadFilter(),gain=ac.createGain();
-   src.buffer=noiseBuffer;
-   filter.type=opts.filterType||'bandpass'; filter.frequency.value=opts.filter||1400; filter.Q.value=opts.q||1.2;
-   env(gain,now,opts.gain||.06,opts.attack||.001,opts.duration||.08);
-   src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
-   src.start(now); src.stop(now+(opts.duration||.08)+.03);
+  function playMove(meta={}){
+   if(!enabled)return;
+   const ac=unlock();if(!ac)return;
+   const t=ac.currentTime+.012;
+   tap(t,meta.capture?1.12:1,meta.capture?.85:1);
+   tap(t+.047,meta.capture?.74:.62,meta.capture?1.12:.94);
   }
-  const profiles={
-   classic:meta=>{tone({type:'triangle',freq:460,slide:390,duration:.09,gain:.12,filter:1800});if(meta.capture)tone({type:'sine',freq:250,slide:190,delay:.03,duration:.11,gain:.07,filter:900});if(meta.check)tone({type:'sine',freq:760,delay:.06,duration:.08,gain:.055,filter:2400});},
-   dragons:meta=>{tone({type:'sawtooth',freq:182,slide:140,duration:.16,gain:.1,filter:900});noise({filter:720,delay:.016,duration:.055,gain:.038,q:.9});if(meta.capture)tone({type:'triangle',freq:130,slide:98,delay:.045,duration:.16,gain:.07,filter:700});},
-   fortress:meta=>{tone({type:'square',freq:320,slide:300,duration:.07,gain:.08,filter:2600});tone({type:'triangle',freq:510,slide:430,delay:.014,duration:.11,gain:.06,filter:2200});if(meta.capture||meta.castle)tone({type:'square',freq:640,slide:500,delay:.05,duration:.12,gain:.05,filter:2800});},
-   cosmos:meta=>{tone({type:'sine',freq:560,slide:710,duration:.18,gain:.08,filter:3200});tone({type:'triangle',freq:310,slide:450,delay:.032,duration:.18,gain:.04,filter:2400});if(meta.check)tone({type:'sine',freq:930,delay:.08,duration:.12,gain:.04,filter:3600});},
-   mystic:meta=>{tone({type:'triangle',freq:540,slide:470,duration:.2,gain:.08,filter:2300});tone({type:'sine',freq:810,slide:750,delay:.028,duration:.18,gain:.05,filter:3000});if(meta.capture)tone({type:'sine',freq:360,slide:290,delay:.055,duration:.14,gain:.045,filter:1800});},
-   celestial:meta=>{tone({type:'sine',freq:520,slide:600,duration:.16,gain:.08,filter:2600});tone({type:'triangle',freq:780,slide:690,delay:.022,duration:.16,gain:.045,filter:2900});if(meta.check)tone({type:'sine',freq:980,delay:.075,duration:.1,gain:.04,filter:3500});},
-   abyss:meta=>{tone({type:'triangle',freq:220,slide:170,duration:.16,gain:.1,filter:900});tone({type:'sine',freq:145,slide:120,delay:.028,duration:.18,gain:.045,filter:700});if(meta.capture)noise({filter:540,delay:.04,duration:.06,gain:.03,q:.7});},
-   pixel:meta=>{tone({type:'square',freq:660,slide:560,duration:.05,gain:.08,filter:4000});tone({type:'square',freq:520,slide:440,delay:.045,duration:.05,gain:.05,filter:3500});if(meta.capture)tone({type:'square',freq:260,slide:180,delay:.085,duration:.07,gain:.05,filter:2600});}
-  };
-  function playMove(appearance,meta={}){
-   const skin=ChessThemes.get(appearance||'palette:classic').skin||'classic';
-   (profiles[skin]||profiles.classic)(meta);
-  }
-  return {playMove};
+  function setEnabled(value){enabled=Boolean(value);save('baldchess_sound',String(enabled));if(enabled)unlock();}
+  return {playMove,setEnabled,isEnabled:()=>enabled};
  })();
  let lastMoveSoundSignature='';
  function maybePlayMoveSound(room){
   if(!room?.state){lastMoveSoundSignature='';return;}
   const s=room.state,move=s.last_move;
-  if(!move||!s.move_count)return;
+  if(!move||!s.move_count){lastMoveSoundSignature=room.code+'|idle';return;}
   const moveItem=[...s.history].reverse().find(item=>item&&typeof item==='object'&&item.kind==='move');
   const mover=moveItem?.color||null;
   const signature=[room.code,s.move_count,move.from?.join('-')||'',move.to?.join('-')||'',mover||''].join('|');
   if(!lastMoveSoundSignature||!lastMoveSoundSignature.startsWith(room.code+'|')){lastMoveSoundSignature=signature;return;}
   if(signature===lastMoveSoundSignature)return;
   lastMoveSoundSignature=signature;
-  const appearance=room.appearances?.[mover]||'palette:classic';
-  ChessAudio.playMove(appearance,{capture:Boolean(moveItem?.capture),castle:Boolean(moveItem?.castle),promotion:Boolean(moveItem?.promotion),check:Object.values(s.checks||{}).some(Boolean)});
+  ChessAudio.playMove({capture:Boolean(moveItem?.capture),castle:Boolean(moveItem?.castle)});
+ }
+ let lastAnimatedMoveSignature='';
+ function animateLastMove(room){
+  if(!room||!room.state?.last_move){lastAnimatedMoveSignature=room?.code?room.code+'|idle':'';return;}
+  const state=room.state,from=state.last_move.from,to=state.last_move.to;
+  const signature=room.code+'|'+state.move_count+'|'+from.join(',')+'|'+to.join(',');
+  if(!lastAnimatedMoveSignature||!lastAnimatedMoveSignature.startsWith(room.code+'|')){
+   lastAnimatedMoveSignature=signature;return;
+  }
+  if(lastAnimatedMoveSignature===signature)return;
+  lastAnimatedMoveSignature=signature;
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+  const start=cells[from[0]]?.[from[1]],end=cells[to[0]]?.[to[1]];
+  const piece=end?.querySelector('.piece');
+  if(!start||!end||!piece||!piece.animate)return;
+  const first=start.getBoundingClientRect(),last=end.getBoundingClientRect();
+  const dx=first.left+first.width/2-last.left-last.width/2;
+  const dy=first.top+first.height/2-last.top-last.height/2;
+  const degrees={red:0,yellow:180,blue:90,green:-90}[room.role]||0;
+  const rot=degrees?' rotate('+degrees+'deg)':'';
+  // Animate the actual piece, keeping its silhouette upright in every view.
+  piece.animate([{transform:`translate(${dx}px,${dy}px)${rot}`},{transform:`translate(0px,0px)${rot}`}],
+   {duration:165,easing:'cubic-bezier(.2,.8,.25,1)'});
  }
  function pieceSpan(p,skin,color,dead=false){
   const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin));return el;
@@ -131,6 +156,8 @@
   const cell=editorCells[r][c];if(!ChessBoard.playable(r,c,editorSize))continue;cell.replaceChildren();const p=editor.board[r]?.[c];if(p)cell.appendChild(pieceSpan(p,'classic',colorFor(p)));
  }}
  function renderBoard(room,selected,moves,premove){
+  const orientation=room?.role&&room.role!=='spectator'?room.role:'red';
+  $('board').className='board orientation-'+orientation;
   const state=room?.state,mode=state?.options.mode||chosenMode;
   ensureBoard(mode);const size=boardSize,board=state?.board||ChessBoard.startBoard(mode),hits=new Set(moves.map(p=>p.join(',')));
   for(let r=0;r<size;r++)for(let c=0;c<size;c++){
@@ -144,7 +171,7 @@
    if(state?.last_move&&[state.last_move.from,state.last_move.to].some(pos=>pos[0]===r&&pos[1]===c))el.classList.add('last-move');
    if(selected?.r===r&&selected?.c===c)el.classList.add('selected');
    if(hits.has(`${r},${c}`)){const source=selected&&board[selected.r][selected.c];el.classList.add(p?'can-take':'can-move');if(p?.type==='R'&&source?.type==='K'&&source.color===p.color)el.classList.add('can-castle');}
-   if(premove&&[premove.from,premove.to].some(pos=>pos[0]===r&&pos[1]===c))el.classList.add('queued');
+   if(premove&&premove.to[0]===r&&premove.to[1]===c)el.classList.add('queued');
    if(p){const appearance=pieceAppearance(room,p.color),skin=ChessThemes.get(appearance).skin;el.appendChild(pieceSpan(p,skin,colorFor(p,room,appearance),state&&!state.active[p.color]));if(state&&p.type==='K'&&state.active[p.color]&&state.checks[p.color])el.classList.add('king-check');el.setAttribute('aria-label',`${ChessBoard.squareName(r,c,size)}: ${colorLabel(p.color)}, ${p.type}`);}
    else el.setAttribute('aria-label',ChessBoard.squareName(r,c,size));
    if(r===size-1||!ChessBoard.playable(r+1,c,size)){const label=document.createElement('span');label.className='coord file';label.textContent='abcdefghijklmn'[c];el.appendChild(label);}
@@ -213,29 +240,29 @@
  function render(room,selected,moves,premove){
   maybePlayMoveSound(room);
   renderBoard(room,selected,moves,premove);
-  const has=Boolean(room);$('welcome').hidden=!showWelcome;$('game-page').hidden=showWelcome||!has;$('back-to-game').hidden=!has;$('loading').hidden=has;
-  $('invite-panel').hidden=!has;$('appearance-card').hidden=!has;
+  animateLastMove(room);
+  const has=Boolean(room);setHidden('welcome',!showWelcome);setHidden('game-page',showWelcome||!has);setHidden('back-to-game',!has);setHidden('loading',has);
+  setHidden('invite-panel',!has);setHidden('appearance-card',!has);
   $('resign-button').disabled=!has||room.state.status!=='playing'||room.role==='spectator'||!room.state.active[room.role];
-  $('reset-button').disabled=!has||room.role!=='red';$('premove-bar').hidden=!premove;
-  if(premove)$('premove-message').textContent=`${ChessBoard.squareName(...premove.from,boardSize)} → ${ChessBoard.squareName(...premove.to,boardSize)}`;
+  $('reset-button').disabled=!has||room.role!=='red';
   if(!has)return;
   chosenMode=room.state.options.mode;
   const s=room.state,opts=s.options,waiting=s.status==='waiting',done=s.status==='finished',list=players(opts.mode),myTurn=ChessGame.controlled(s.turn);
   // Keep the move history visible in the lobby and during play.
-  $('history-card').hidden=false;
+  setHidden('history-card',false);
   $('invite-panel').classList.toggle('compact-lobby',!waiting);
-  $('show-player-themes').closest('label').title=t('showPlayerHelp');
+  if($('show-player-themes')?.closest('label'))$('show-player-themes').closest('label').title=t('showPlayerHelp');
   $('game-mode').textContent=opts.mode==='duel'?t('oneVsOne'):opts.format==='teams'?t('teamsHeader'):t('freeForAllHeader');
   $('game-title').textContent=opts.variant==='fischer'?t('fischer'):opts.variant==='custom'?t('custom'):'BALDCHESS';
   $('mode-label').textContent=t('room')+' '+room.code;
   $('turn-name').textContent=done?(s.winners.length?t('win')+': '+s.winners.map(c=>playerName(room,c)).join(', '):t('draw')):waiting?t('waiting'):playerName(room,s.turn);
-  $('turn-detail').textContent=done?t('finished'):waiting?room.joined+' / '+list.length:(myTurn?(s.checks[s.turn]?t('check'):t('ready')):(opts.premoves&&room.role!=='spectator'?t('premoveAllowed'):t('opponent')));
+  $('turn-detail').textContent=done?t('finished'):waiting?room.joined+' / '+list.length:(myTurn?(s.checks[s.turn]?t('check'):t('ready')):t('opponent'));
   $('turn-phase').textContent=done?t('endPhase'):waiting?t('lobbyPhase'):t('playingPhase');
   $('status-message').textContent=waiting?t('inviteOthers'):done?t('finished'):s.checks[s.turn]?t('check'):t('turnNow')+': '+playerName(room,s.turn);
   $('move-counter').textContent=t('moves')+': '+s.move_count;
   $('player-count').textContent=room.joined+' / '+list.length;
   $('room-code').textContent=room.code;
-  $('edit-settings').hidden=!(room.role==='red'&&waiting);
+  setHidden('edit-settings',!(room.role==='red'&&waiting));
   $('customize-button').disabled=room.role==='spectator';
   $('room-options-summary').textContent=[t({classic:'classicSetup',fischer:'fischerSetup',custom:'customSetup'}[opts.variant]),opts.mode==='duel'?t('oneVsOne'):opts.format==='teams'?t('teamsMode'):t('ffa'),opts.seat_minutes?t('individual'):opts.minutes?opts.minutes+' '+t('minute'):t('noClock'),opts.premoves?t('premovesOn'):t('premovesOff')].join(' · ');
   $('invite-hint').textContent=waiting?t('inviteOthers'):t('stay');
@@ -270,16 +297,16 @@
  for(const c of ChessBoard.COLORS){let opt=document.createElement('option');opt.value=c;$('editor-color').append(opt);}
  for(const kind of ['K','Q','R','B','N','P','erase']){let opt=document.createElement('option');opt.value=kind;$('editor-piece').append(opt);}
  function setModeUI(){
-  const duel=chosenMode==='duel';$('format-field').hidden=duel;$('team-settings').hidden=duel||$('format-select').value!=='teams';
-  for(const c of ChessBoard.COLORS){$('time-label-'+c).parentElement.hidden=duel&&!['red','yellow'].includes(c);$('team-label-'+c).parentElement.hidden=duel;}
+  const duel=chosenMode==='duel';setHidden('format-field',duel);setHidden('team-settings',duel||$('format-select').value!=='teams');
+  for(const c of ChessBoard.COLORS){const clock=$('time-label-'+c)?.parentElement,team=$('team-label-'+c)?.parentElement;if(clock)clock.hidden=duel&&!['red','yellow'].includes(c);if(team)team.hidden=duel;}
   for(const c of ChessBoard.COLORS) $('editor-color').querySelector(`option[value="${c}"]`).hidden=duel&&!['red','yellow'].includes(c);
   if(duel&&!['red','yellow'].includes($('editor-color').value))$('editor-color').value='red';
-  $('custom-settings').hidden=$('setup-select').value!=='custom';
+  setHidden('custom-settings',$('setup-select').value!=='custom');
   renderEditor();
  }
  function fillOptions(opts){
   $('setup-select').value=opts.variant;$('format-select').value=opts.format;$('minutes-select').value=opts.minutes;$('increment-select').value=opts.increment;
-  $('allow-premoves').checked=opts.premoves;$('separate-clocks').checked=Boolean(opts.seat_minutes);$('seat-clock-settings').hidden=!opts.seat_minutes;
+  $('allow-premoves').checked=opts.premoves;$('separate-clocks').checked=Boolean(opts.seat_minutes);setHidden('seat-clock-settings',!opts.seat_minutes);
   for(const c of ChessBoard.COLORS){$('team-'+c).value=opts.teams[c];$('seat-time-'+c).value=opts.seat_minutes?.[c]||opts.minutes||10;}
   editor.board=opts.custom_board?JSON.parse(JSON.stringify(opts.custom_board)):ChessBoard.startBoard(chosenMode);
   setModeUI();
@@ -293,7 +320,7 @@
  function openSettings(edit=false){
   editing=edit;const room=ChessGame.get().room;if(edit&&room)chosenMode=room.state.options.mode;
   $('settings-title').textContent=edit?t('settings'):t('createLobby');$('save-settings').textContent=edit?t('save'):t('createLobby');
-  $('host-name-field').hidden=edit;$('settings-error').textContent='';
+  setHidden('host-name-field',edit);$('settings-error').textContent='';
   if(!edit)$('host-name').value=rememberedNickname()||'Player 1';
   if(edit&&room)fillOptions(room.state.options);else fillOptions({variant:'classic',format:'ffa',minutes:10,increment:0,premoves:true,teams:{red:0,blue:1,yellow:2,green:3},seat_minutes:null});
   $('settings-dialog').showModal();
@@ -306,7 +333,7 @@
  $('close-settings').addEventListener('click',()=>$('settings-dialog').close());
  $('setup-select').addEventListener('change',setModeUI);
  $('format-select').addEventListener('change',setModeUI);
- $('separate-clocks').addEventListener('change',()=>{$('seat-clock-settings').hidden=!$('separate-clocks').checked;});
+ $('separate-clocks').addEventListener('change',()=>{setHidden('seat-clock-settings',!$('separate-clocks').checked);});
  document.querySelectorAll('.team-preset').forEach(el=>el.addEventListener('click',()=>{const preset={two:[0,1,0,1],three:[0,0,0,1],split:[0,1,0,2]}[el.dataset.preset];ChessBoard.COLORS.forEach((c,i)=>{$('team-'+c).value=preset[i];});}));
  $('editor-clear').addEventListener('click',()=>{editor.board=Array.from({length:editorSize},()=>Array(editorSize).fill(null));renderEditor();});
  $('editor-standard').addEventListener('click',()=>{editor.board=ChessBoard.startBoard(chosenMode);renderEditor();});
@@ -341,8 +368,9 @@
  $('copy-link').addEventListener('click',()=>copy(location.origin+location.pathname+'?room='+ChessGame.get().room.code));
  $('resign-button').addEventListener('click',()=>{if(confirm(t('confirmResign')))ChessGame.action('resign').catch(err=>toast(serverError(err.message)));});
  $('reset-button').addEventListener('click',()=>{if(confirm(t('confirmRematch')))ChessGame.action('reset').catch(err=>toast(serverError(err.message)));});
- $('cancel-premove').addEventListener('click',ChessGame.cancelPremove);
+
  // One local switch: show the board portions and custom pieces chosen by other players.
+ $('sound-enabled')?.addEventListener('change',e=>ChessAudio.setEnabled(e.target.checked));
  $('show-player-themes').addEventListener('change',()=>{
   showPlayerThemes=$('show-player-themes').checked;save('baldchess_show_player_themes',String(showPlayerThemes));
   const g=ChessGame.get();renderBoard(g.room,g.selected,g.moves,g.premove);
@@ -400,7 +428,13 @@
  // Pointer-controlled dragging works with mouse and touch, without disabling click-to-move.
  let ignoreClick=false,drag=null;
  const boardEl=$('board');
+ const cancelPointer=()=>{
+  if(drag){drag.ghost?.remove();drag=null;ignoreClick=true;setTimeout(()=>{ignoreClick=false;},0);}
+  ChessGame.cancelInteraction();
+ };
+ boardEl.addEventListener('contextmenu',e=>e.preventDefault());
  boardEl.addEventListener('pointerdown',e=>{
+  if(e.button===2){e.preventDefault();cancelPointer();return;}
   if(e.button!==0&&e.pointerType==='mouse')return;
   const square=e.target.closest('.square');if(!square)return;
   const r=Number(square.dataset.r),c=Number(square.dataset.c),game=ChessGame.get(),p=game.room?.state.board[r]?.[c];
@@ -415,16 +449,22 @@
   }
   if(drag.moved){e.preventDefault();drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';}
  },{passive:false});
+ document.addEventListener('pointerdown',e=>{
+  if(e.button===2&&drag){e.preventDefault();cancelPointer();}
+ },{capture:true});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag)cancelPointer();});
  document.addEventListener('pointerup',e=>{
+  if(e.button===2){if(drag)cancelPointer();return;}
   if(!drag)return;const current=drag;drag=null;current.ghost?.remove();if(!current.moved)return;
   ignoreClick=true;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('#board .square');
   if(el){const to=[Number(el.dataset.r),Number(el.dataset.c)];ChessGame.drag(current.from,to).catch(err=>toast(serverError(err.message)));}
   setTimeout(()=>{ignoreClick=false;},0);
  });
- document.addEventListener('pointercancel',()=>{drag?.ghost?.remove();drag=null;});
+ document.addEventListener('pointercancel',()=>{if(drag)cancelPointer();});
  // Default is English, regardless of the operating-system language.
  language=load('baldchess_language','en');if(language!=='ru')language='en';showPlayerThemes=load('baldchess_show_player_themes','true')!=='false';
  $('show-player-themes').checked=showPlayerThemes;
+ if($('sound-enabled'))$('sound-enabled').checked=ChessAudio.isEnabled();
  translate();
  ChessGame.bootstrap().then(result=>{
   if(result.joined){showWelcome=false;const resumed=ChessGame.get().room;saveNickname(resumed?.seats?.[resumed.role]);}
