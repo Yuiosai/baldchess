@@ -48,52 +48,53 @@
   const closed=()=>finish('Q');d.addEventListener('click',pick);d.addEventListener('close',closed);d.showModal();
  })};
 
- // Shared, original wooden chess-click sound. Same for every palette and art skin.
+ // Original wooden chess taps as WAV samples; identical for every skin.
  const ChessAudio=(()=>{
-  let context=null,buffer=null;
-  let enabled=load('baldchess_sound','true')!=='false';
+  const paths={move:'/assets/move.wav?v=5162',capture:'/assets/capture.wav?v=5162'};
+  const enabledKey='baldchess_sound';
+  let enabled=load(enabledKey,'true')!=='false',context=null,buffers={},raw={},readyPromise=null;
   const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  // Download early; decode after first user gesture to comply with autoplay rules.
+  readyPromise=Promise.all(Object.entries(paths).map(async ([key,path])=>{
+   try{const res=await fetch(path,{cache:'force-cache'});if(res.ok)raw[key]=await res.arrayBuffer();}catch{}
+  }));
+  const fallback={};
+  for(const [key,path] of Object.entries(paths)){
+   try{fallback[key]=new Audio(path);fallback[key].preload='auto';fallback[key].volume=.83;}catch{}
+  }
   function unlock(){
-   if(!AudioCtor||!enabled)return null;
-   if(!context)context=new AudioCtor();
-   if(context.state==='suspended')context.resume().catch(()=>{});
-   if(!buffer){
-    buffer=context.createBuffer(1,Math.round(context.sampleRate*.17),context.sampleRate);
-    const data=buffer.getChannelData(0);
-    // Soft damped tap rather than digital beeps or themed sound effects.
-    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-27*i/data.length);
-   }
-   return context;
+   if(!AudioCtor)return;
+   try{
+    context??=new AudioCtor();
+    if(context.state!=='running')context.resume().catch(()=>{});
+    readyPromise?.then(async ()=>{
+     for(const [key,data] of Object.entries(raw)){
+      if(!buffers[key]){
+       try{buffers[key]=await context.decodeAudioData(data.slice(0));}catch{}
+      }
+     }
+    });
+   }catch{}
   }
-  window.addEventListener('pointerdown',()=>{if(enabled)unlock();},{passive:true});
-  window.addEventListener('keydown',()=>{if(enabled)unlock();});
-  function tap(at,level=1,pitch=1){
-   const ac=unlock();if(!ac)return;
-   const hiss=ac.createBufferSource(),band=ac.createBiquadFilter(),amp=ac.createGain();
-   hiss.buffer=buffer;
-   band.type='lowpass';band.frequency.value=1180*pitch;band.Q.value=.4;
-   amp.gain.setValueAtTime(.0001,at);
-   amp.gain.linearRampToValueAtTime(.125*level,at+.003);
-   amp.gain.exponentialRampToValueAtTime(.0001,at+.063);
-   hiss.connect(band);band.connect(amp);amp.connect(ac.destination);
-   hiss.start(at);hiss.stop(at+.075);
-   const osc=ac.createOscillator(),body=ac.createGain();
-   osc.type='sine';osc.frequency.setValueAtTime(225*pitch,at);
-   osc.frequency.exponentialRampToValueAtTime(95*pitch,at+.06);
-   body.gain.setValueAtTime(.0001,at);
-   body.gain.linearRampToValueAtTime(.04*level,at+.002);
-   body.gain.exponentialRampToValueAtTime(.0001,at+.075);
-   osc.connect(body);body.connect(ac.destination);
-   osc.start(at);osc.stop(at+.085);
-  }
+  window.addEventListener('pointerdown',unlock,{passive:true});
+  window.addEventListener('keydown',unlock);
   function playMove(meta={}){
    if(!enabled)return;
-   const ac=unlock();if(!ac)return;
-   const t=ac.currentTime+.012;
-   tap(t,meta.capture?1.12:1,meta.capture?.85:1);
-   tap(t+.047,meta.capture?.74:.62,meta.capture?1.12:.94);
+   const key=meta.capture?'capture':'move';
+   if(context?.state==='running'&&buffers[key]){
+    const src=context.createBufferSource(),gain=context.createGain();
+    src.buffer=buffers[key];gain.gain.value=.82;
+    src.connect(gain);gain.connect(context.destination);
+    src.start();return;
+   }
+   // HTML Audio fallback while the browser is preparing Web Audio.
+   const original=fallback[key];if(!original)return;
+   try{const sound=original.cloneNode();sound.volume=.83;sound.play().catch(()=>{});}catch{}
   }
-  function setEnabled(value){enabled=Boolean(value);save('baldchess_sound',String(enabled));if(enabled)unlock();}
+  function setEnabled(value){
+   enabled=Boolean(value);save(enabledKey,String(enabled));
+   if(enabled){unlock();playMove();} // Immediate audible confirmation.
+  }
   return {playMove,setEnabled,isEnabled:()=>enabled};
  })();
  let lastMoveSoundSignature='';
@@ -126,11 +127,9 @@
   const first=start.getBoundingClientRect(),last=end.getBoundingClientRect();
   const dx=first.left+first.width/2-last.left-last.width/2;
   const dy=first.top+first.height/2-last.top-last.height/2;
-  const degrees={red:0,yellow:180,blue:90,green:-90}[room.role]||0;
-  const rot=degrees?' rotate('+degrees+'deg)':'';
-  // Animate the actual piece, keeping its silhouette upright in every view.
-  piece.animate([{transform:`translate(${dx}px,${dy}px)${rot}`},{transform:`translate(0px,0px)${rot}`}],
-   {duration:165,easing:'cubic-bezier(.2,.8,.25,1)'});
+  // Visual grid is already oriented; animate with screen-relative deltas.
+  piece.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'translate(0px,0px)'}],
+   {duration:125,easing:'cubic-bezier(.18,.75,.25,1)'});
  }
  function pieceSpan(p,skin,color,dead=false){
   const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin));return el;
@@ -139,6 +138,31 @@
  function shownAppearance(room,color){return !showPlayerThemes?myAppearance(room):(room?.appearances?.[color]||'palette:classic');}
  function pieceAppearance(room,color){return shownAppearance(room,color);}
  function colorFor(p,room,appearance){const theme=ChessThemes.get(appearance||shownAppearance(room,p.color));const mode=room?.state?.options?.mode||chosenMode;const localUniform=room && !showPlayerThemes && mode==='four';const palette=localUniform&&(theme.uniformPiece||theme.piece)?(theme.uniformPiece||theme.piece):theme.piece;return palette[p.color];}
+ let currentBoardOrientation='';
+ function orientedCell(r,c,size,orientation){
+  if(orientation==='yellow')return [size-1-r,size-1-c];
+  if(orientation==='blue')return [size-1-c,r];
+  if(orientation==='green')return [c,size-1-r];
+  return [r,c];
+ }
+ function inverseCell(r,c,size,orientation){
+  if(orientation==='yellow')return [size-1-r,size-1-c];
+  if(orientation==='blue')return [c,size-1-r];
+  if(orientation==='green')return [size-1-c,r];
+  return [r,c];
+ }
+ function setBoardOrientation(orientation,size){
+  if(currentBoardOrientation===orientation)return;
+  currentBoardOrientation=orientation;
+  // Move the cells inside the grid rather than rotating the entire canvas.
+  // The pieces, highlights, coordinates and pointer targets stay upright.
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++){
+   const [vr,vc]=orientedCell(r,c,size,orientation);
+   cells[r][c].style.order=String(vr*size+vc);
+  }
+  boardRenderCache=[];
+ }
+ let boardRenderCache=[];
  function buildCells(target,size,sink,onChoose){
   sink.length=0;const fragment=document.createDocumentFragment();
   for(let r=0;r<size;r++){let row=[];for(let c=0;c<size;c++){
@@ -150,7 +174,7 @@
   target.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;
   target.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;
  }
- function ensureBoard(mode){const size=mode==='duel'?8:14;if(boardSize!==size){boardSize=size;buildCells($('board'),size,cells,(r,c)=>{if(ignoreClick){ignoreClick=false;return;}ChessGame.choose(r,c).catch(e=>toast(serverError(e.message)));});}}
+ function ensureBoard(mode){const size=mode==='duel'?8:14;if(boardSize!==size){boardSize=size;currentBoardOrientation='';boardRenderCache=[];buildCells($('board'),size,cells,(r,c)=>{if(ignoreClick){ignoreClick=false;return;}ChessGame.choose(r,c).catch(e=>toast(serverError(e.message)));});}}
  function ensureEditor(){const size=chosenMode==='duel'?8:14;if(editorSize!==size){editorSize=size;buildCells($('editor-board'),size,editorCells,(r,c)=>{const kind=$('editor-piece').value;editor.board[r][c]=kind==='erase'?null:{color:$('editor-color').value,type:kind};renderEditor();});}}
  function renderEditor(){ensureEditor();for(let r=0;r<editorSize;r++)for(let c=0;c<editorSize;c++){
   const cell=editorCells[r][c];if(!ChessBoard.playable(r,c,editorSize))continue;cell.replaceChildren();const p=editor.board[r]?.[c];if(p)cell.appendChild(pieceSpan(p,'classic',colorFor(p)));
@@ -160,22 +184,39 @@
   $('board').className='board orientation-'+orientation;
   const state=room?.state,mode=state?.options.mode||chosenMode;
   ensureBoard(mode);const size=boardSize,board=state?.board||ChessBoard.startBoard(mode),hits=new Set(moves.map(p=>p.join(',')));
+  setBoardOrientation(orientation,size);
   for(let r=0;r<size;r++)for(let c=0;c<size;c++){
    if(!ChessBoard.playable(r,c,size))continue;
    const el=cells[r][c],p=board[r]?.[c],zone=ChessThemes.owner(r,c,size);
    const tileTheme=ChessThemes.get(shownAppearance(room,zone));
+   const appearance=p?pieceAppearance(room,p.color):'';
+   const [vr,vc]=orientedCell(r,c,size,orientation);
+   const south=vr<size-1?inverseCell(vr+1,vc,size,orientation):null;
+   const west=vc>0?inverseCell(vr,vc-1,size,orientation):null;
+   const labelFile=!south||!ChessBoard.playable(...south,size);
+   const labelRank=!west||!ChessBoard.playable(...west,size);
+   const highlight=state?.last_move&&[state.last_move.from,state.last_move.to].some(pos=>pos[0]===r&&pos[1]===c);
+   const selectedNow=selected?.r===r&&selected?.c===c;
+   const canMove=hits.has(`${r},${c}`);
+   const queued=premove&&premove.to[0]===r&&premove.to[1]===c;
+   const check=p?.type==='K'&&state?.active[p.color]&&state?.checks[p.color];
+   const dead=Boolean(p&&state&&!state.active[p.color]);
+   const cache=[p?.type||'',p?.color||'',dead,appearance,showPlayerThemes,orientation,language,
+    tileTheme.light,tileTheme.dark,tileTheme.art||'',highlight,selectedNow,canMove,queued,check].join('|');
+   if(boardRenderCache[r]?.[c]===cache)continue;
+   (boardRenderCache[r]??=[])[c]=cache;
    el.className='square '+((r+c)%2?'dark':'light')+(tileTheme.art?' theme-art':'');
    el.dataset.art=tileTheme.art||'';
    el.style.setProperty('--tile-light',tileTheme.light);el.style.setProperty('--tile-dark',tileTheme.dark);
    el.replaceChildren();
-   if(state?.last_move&&[state.last_move.from,state.last_move.to].some(pos=>pos[0]===r&&pos[1]===c))el.classList.add('last-move');
-   if(selected?.r===r&&selected?.c===c)el.classList.add('selected');
-   if(hits.has(`${r},${c}`)){const source=selected&&board[selected.r][selected.c];el.classList.add(p?'can-take':'can-move');if(p?.type==='R'&&source?.type==='K'&&source.color===p.color)el.classList.add('can-castle');}
-   if(premove&&premove.to[0]===r&&premove.to[1]===c)el.classList.add('queued');
-   if(p){const appearance=pieceAppearance(room,p.color),skin=ChessThemes.get(appearance).skin;el.appendChild(pieceSpan(p,skin,colorFor(p,room,appearance),state&&!state.active[p.color]));if(state&&p.type==='K'&&state.active[p.color]&&state.checks[p.color])el.classList.add('king-check');el.setAttribute('aria-label',`${ChessBoard.squareName(r,c,size)}: ${colorLabel(p.color)}, ${p.type}`);}
+   if(highlight)el.classList.add('last-move');
+   if(selectedNow)el.classList.add('selected');
+   if(canMove){const source=selected&&board[selected.r][selected.c];el.classList.add(p?'can-take':'can-move');if(p?.type==='R'&&source?.type==='K'&&source.color===p.color)el.classList.add('can-castle');}
+   if(queued)el.classList.add('queued');
+   if(p){const skin=ChessThemes.get(appearance).skin;el.appendChild(pieceSpan(p,skin,colorFor(p,room,appearance),dead));if(check)el.classList.add('king-check');el.setAttribute('aria-label',`${ChessBoard.squareName(r,c,size)}: ${colorLabel(p.color)}, ${p.type}`);}
    else el.setAttribute('aria-label',ChessBoard.squareName(r,c,size));
-   if(r===size-1||!ChessBoard.playable(r+1,c,size)){const label=document.createElement('span');label.className='coord file';label.textContent='abcdefghijklmn'[c];el.appendChild(label);}
-   if(c===0||!ChessBoard.playable(r,c-1,size)){const label=document.createElement('span');label.className='coord rank';label.textContent=size-r;el.appendChild(label);}
+   if(labelFile){const label=document.createElement('span');label.className='coord file';label.textContent='abcdefghijklmn'[c];el.appendChild(label);}
+   if(labelRank){const label=document.createElement('span');label.className='coord rank';label.textContent=size-r;el.appendChild(label);}
   }
  }
  function clockText(seconds){const n=Math.max(0,Math.ceil(seconds));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
@@ -471,5 +512,13 @@
   else if(result.invite){$('join-code').value=result.invite;openJoin();}
   if(result.error)toast(serverError(result.error));const g=ChessGame.get();render(g.room,g.selected,g.moves,g.premove);
  }).catch(err=>toast(serverError(err.message)));
- setInterval(()=>ChessGame.poll(),1500);setInterval(updateClock,250);
+ // Separate single-flight polling; don't waste requests in an empty page or waiting lobby.
+ const pollTick=()=>{
+  const {room}=ChessGame.get();
+  ChessGame.poll().finally(()=>{
+   const ms=!room||room.state.status==='waiting'?1600:room.state.options.mode==='duel'?850:1000;
+   setTimeout(pollTick,ms);
+  });
+ };
+ setTimeout(pollTick,700);setInterval(updateClock,250);
 })();
