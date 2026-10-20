@@ -270,3 +270,23 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 /* Art is 97.8% of a cell (94% * 1.04), leaving breathing space. */
 .board .square .piece .art{transform:scale(1.04);transform-origin:center}
 
+
+/* BaldChess 5.14 — richer piece lighting, subtle board lift, no gaudy crystal look. */
+.piece .art{filter:drop-shadow(0 1px 1px #0c1420cc) drop-shadow(0 3px 5px #09111a6e)}
+.board .square .art svg{overflow:visible}
+.board .square .piece .art{transform:scale(1.02);transform-origin:center}
+.board .square .piece .art-classic,
+.board .square .piece .art-fortress,
+.board .square .piece .art-celestial{filter:drop-shadow(0 1px 1px #111823cc) drop-shadow(0 3px 4px #08111b76) brightness(1.03)}
+.board .square .piece .art-dragons,
+.board .square .piece .art-abyss{filter:drop-shadow(0 1px 1px #101822d1) drop-shadow(0 4px 5px #070d167e) saturate(1.05)}
+.board .square .piece .art-cosmos,
+.board .square .piece .art-mystic,
+.board .square .piece .art-pixel{filter:drop-shadow(0 1px 1px #121b28d0) drop-shadow(0 3px 5px #09111a7d) brightness(1.02)}
+
+@media (min-width:880px){
+ .game-panel{grid-template-rows:28px minmax(0,1fr) 24px}
+ .game-header{padding:0 3px 4px}
+ .board-wrapper{transform:translateY(-6px)}
+ .board-footer{padding:3px 3px 0}
+}
