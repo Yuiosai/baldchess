@@ -313,3 +313,9 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 /* Two compact choices inside the existing display card; no new sidebar panel. */
 .display-card .display-toggle{display:flex!important;margin:0;align-items:center;min-height:27px}
 .display-card .display-toggle + .display-toggle{margin-top:4px}
+
+/* 5.16.2: rotate grid positions instead of its canvas; never rotate the figures. */
+.board.orientation-yellow,.board.orientation-blue,.board.orientation-green{transform:none!important}
+.board.orientation-yellow .piece,.board.orientation-blue .piece,.board.orientation-green .piece,
+.board.orientation-yellow .coord,.board.orientation-blue .coord,.board.orientation-green .coord{transform:none!important}
+.board .square{transition:none}

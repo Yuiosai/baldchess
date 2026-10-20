@@ -29,7 +29,7 @@ DEFAULT_COLORS = {'red':'#f86c86','blue':'#68bfff','yellow':'#ffcf6a','green':'#
 RATE_LOCK = threading.Lock()
 RATE_LOG = {}
 RATE_LIMITS = {'create': (10, 60), 'join': (30, 60),
-               'write': (120, 60), 'read': (240, 60)}
+               'write': (120, 60), 'read': (360, 60)}
 MAX_ROOMS = 300
 ROOM_LIFETIME = {'waiting': 2 * 86400, 'finished': 7 * 86400,
                  'playing': 30 * 86400}
@@ -254,6 +254,8 @@ class Handler(BaseHTTPRequestHandler):
                  '/favicon.svg': ('favicon.svg', 'image/svg+xml'),
                  '/assets/logo.png': ('assets/logo.png', 'image/png'),
                  '/assets/favicon.png': ('assets/favicon.png', 'image/png'),
+                 '/assets/move.wav': ('assets/move.wav', 'audio/wav'),
+                 '/assets/capture.wav': ('assets/capture.wav', 'audio/wav'),
                  '/js/themes.js': ('js/themes.js', 'text/javascript; charset=utf-8')}
         if path not in files:
             self.fail('Страница не найдена', 404)
