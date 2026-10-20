@@ -298,3 +298,18 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 .board .square .piece .art svg{display:block;width:100%;height:100%;overflow:visible}
 .editor-board .piece .art,.mini-square .piece .art,.appearance-swatches .piece .art{filter:drop-shadow(0 2px 2px #060b134d)}
 .editor-board .piece .art svg,.mini-square .piece .art svg,.appearance-swatches .piece .art svg{overflow:visible}
+
+/* 5.16: each player views the chessboard from their own edge, while pieces stay upright. */
+.board.orientation-yellow{transform:rotate(180deg)}
+.board.orientation-blue{transform:rotate(-90deg)}
+.board.orientation-green{transform:rotate(90deg)}
+.board.orientation-yellow .piece{transform:rotate(180deg)}
+.board.orientation-blue .piece{transform:rotate(90deg)}
+.board.orientation-green .piece{transform:rotate(-90deg)}
+.board.orientation-yellow .coord{transform:rotate(180deg)}
+.board.orientation-blue .coord{transform:rotate(90deg)}
+.board.orientation-green .coord{transform:rotate(-90deg)}
+.board .square.queued{box-shadow:inset 0 0 0 3px #d99df9,inset 0 0 18px #a357d038;z-index:3}
+/* Two compact choices inside the existing display card; no new sidebar panel. */
+.display-card .display-toggle{display:flex!important;margin:0;align-items:center;min-height:27px}
+.display-card .display-toggle + .display-toggle{margin-top:4px}

@@ -4,9 +4,20 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- BaldChess is a proper brand name. Our built-in RU/EN selector handles localization; avoid automatic machine translation. -->
 <meta name="google" content="notranslate">
-<meta name="theme-color" content="#88a8c8"><title translate="no">BaldChess</title>
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=513">
-<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=511" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=510" defer></script>
+<meta name="theme-color" content="#88a8c8">
+<meta name="description" content="BaldChess — free online chess for 2 or 4 players. Play with friends in private rooms, choose chess sets, set clocks and customize your board.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://baldchess.com/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="BaldChess">
+<meta property="og:title" content="BaldChess — Online Chess for 2 or 4 Players">
+<meta property="og:description" content="Free multiplayer chess. Create a private room, invite your friends and play 1v1 or four-player chess.">
+<meta property="og:url" content="https://baldchess.com/">
+<meta property="og:image" content="https://baldchess.com/assets/logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="BaldChess — Play Chess Together">
+<meta name="twitter:description" content="Free online chess for two or four players.">
+<title translate="no">BaldChess — Free Online Chess for 2 or 4 Players</title>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=516">
+<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=516" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=516" defer></script>
 </head><body>
 <section class="welcome" id="welcome" aria-label="Choose game mode">
  <div class="welcome-inner">
@@ -27,7 +38,7 @@
 <section class="game-panel"><div class="game-header"><div><span class="eyebrow game-mode-big" id="game-mode">FREE FOR ALL · 4 PLAYERS</span><h1 id="game-title" class="notranslate" translate="no" hidden>BALDCHESS</h1></div><div class="room-tag"><span class="pulse"></span><span id="mode-label">—</span></div></div>
 <div class="board-wrapper"><div id="board" class="board" role="group" aria-label="Chess board"></div><div class="board-loading" id="loading" data-t="createOrJoin">Create a lobby or join using a code</div></div>
 <div class="board-footer"><span id="status-message">—</span><span id="move-counter" class="subtle">—</span></div>
-<div class="premove-bar" id="premove-bar" hidden><span id="premove-message">Premove</span><button class="button outline" id="cancel-premove" data-t="cancel">Cancel</button></div></section>
+</section>
 <aside class="sidebar">
 <section class="side-card turn-card"><div class="section-top"><span class="eyebrow" data-t="turnNow">TO MOVE</span><span id="turn-phase" class="small-indicator">LOBBY</span></div><div class="current-player"><div><h2 id="turn-name">—</h2><p id="turn-detail">—</p></div></div></section>
 <section class="side-card"><div class="section-top"><h3 data-t="players">Players</h3><span class="side-note" id="player-count">0 / 4</span></div><div id="players" class="players"></div></section>
@@ -36,6 +47,7 @@
 <section class="side-card display-card" id="appearance-card" hidden>
  <div class="section-top"><h3 data-t="displayOptions">Display</h3></div>
  <label class="checkline display-toggle" title="Show other players’ themes or use only your own"><input type="checkbox" id="show-player-themes" checked><span data-t="showPlayerSkins">Show other players’ skins</span></label>
+ <label class="checkline display-toggle" title="Mute chess move sounds"><input type="checkbox" id="sound-enabled" checked><span data-t="playSounds">Move sounds</span></label>
  <p class="helper" data-t="showPlayerHelp">Turn off to display the entire board and all pieces in your chosen style. Other players are unaffected.</p>
 </section>
 <div class="bottom-actions"><button class="button outline danger" id="resign-button" disabled data-t="resign">Resign</button><button class="button outline" id="reset-button" disabled data-t="rematch">↻ Rematch</button></div>

@@ -244,6 +244,8 @@ class Handler(BaseHTTPRequestHandler):
     def serve_file(self, path):
         files = {'/': ('index.html', 'text/html; charset=utf-8'),
                  '/index.html': ('index.html', 'text/html; charset=utf-8'),
+                 '/robots.txt': ('robots.txt', 'text/plain; charset=utf-8'),
+                 '/sitemap.xml': ('sitemap.xml', 'application/xml; charset=utf-8'),
                  '/style.css': ('style.css', 'text/css; charset=utf-8'),
                  '/js/board.js': ('js/board.js', 'text/javascript; charset=utf-8'),
                  '/js/game.js': ('js/game.js', 'text/javascript; charset=utf-8'),

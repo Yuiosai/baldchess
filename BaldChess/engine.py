@@ -214,7 +214,7 @@ def between_indices(a, b):
 
 
 def castle_moves(state, r, c, color):
-    """Клик по своей ладье выполняет рокировку; работает и когда K уже на конечной клетке Chess960."""
+    """Legal castling rook squares (internal compatibility for Chess960)."""
     if state["options"]["variant"] == "custom": return []
     board, active, options = state["board"], state["active"], state["options"]
     king = board[r][c]
@@ -255,6 +255,28 @@ def castle_moves(state, r, c, color):
     return found
 
 
+def castling_target(state, r, c, rr, cc):
+    """Return the rook's square when destination means castling.
+
+    Prefer a legal king landing square, but support a rook click if the king
+    starts on its final square (Chess960), and for older clients.
+    """
+    board = state['board']
+    king = board[r][c]
+    if not king or king['type'] != 'K':
+        return None
+    color = king['color']
+    kidx = home_index(color, r, c, len(board))
+    if kidx is None:
+        return None
+    for rook_pos in castle_moves(state, r, c, color):
+        ridx = home_index(color, *rook_pos, len(board))
+        dest = home_square(color, 2 if ridx < kidx else 6, size=len(board))
+        if (rr, cc) == dest and dest != (r, c) or (rr, cc) == rook_pos:
+            return rook_pos
+    return None
+
+
 def pseudo_moves(state, r, c):
     if not playable(r, c, len(state["board"])): return []
     board = state["board"]
@@ -282,7 +304,17 @@ def pseudo_moves(state, r, c):
     elif kind == "K":
         for dr, dc in STRAIGHT + DIAGONAL:
             if available_target(state, color, r + dr, c + dc): result.append((r + dr, c + dc))
-        result.extend(castle_moves(state, r, c, color))
+        for rook_pos in castle_moves(state, r, c, color):
+            # Chess.com-style click or drag king onto c/g, not onto the rook.
+            # Chess960 still supports rook-click if the king is already on c/g.
+            kidx = home_index(color, r, c, len(board))
+            ridx = home_index(color, *rook_pos, len(board))
+            end = home_square(color, 2 if ridx < kidx else 6, size=len(board))
+            if end != (r, c) and end not in result:
+                result.append(end)
+            # Preserve rook-square castling for old clients and Chess960.
+            if rook_pos not in result:
+                result.append(rook_pos)
     else:
         directions = (STRAIGHT if kind == "R" else DIAGONAL if kind == "B" else STRAIGHT + DIAGONAL)
         for dr, dc in directions:
@@ -303,7 +335,7 @@ def promotion_reached(color, r, c, directions=None, size=SIZE):
     return {"up": r <= 6, "down": r >= 7, "right": c >= 7, "left": c <= 6}[direction]
 
 
-def perform_on_board(board, start, end, directions=None, promotion="Q", en_passant=None):
+def perform_on_board(board, start, end, directions=None, promotion="Q", en_passant=None, castle_rook=None):
     r, c = start
     rr, cc = end
     piece = dict(board[r][c])
@@ -311,15 +343,15 @@ def perform_on_board(board, start, end, directions=None, promotion="Q", en_passa
     board[r][c] = None
     castled = False
     promoted = False
-    if piece["type"] == "K" and target and target["type"] == "R" and target["color"] == piece["color"]:
+    if castle_rook is not None:
         color = piece["color"]
         kidx = home_index(color, r, c, len(board))
-        ridx = home_index(color, rr, cc, len(board))
+        ridx = home_index(color, *castle_rook, len(board))
         kd, rd = ((2, 3) if ridx < kidx else (6, 5))
         kr, kc = home_square(color, kd, size=len(board))
         tr, tc = home_square(color, rd, size=len(board))
-        board[rr][cc] = None
-        rook = dict(target)
+        rook = dict(board[castle_rook[0]][castle_rook[1]])
+        board[castle_rook[0]][castle_rook[1]] = None
         rook["moved"] = True
         board[tr][tc] = rook
         piece["moved"] = True
@@ -347,7 +379,9 @@ def legal_moves(state, r, c, color=None):
     result = []
     for dst in pseudo_moves(state, r, c):
         attempt = [line[:] for line in board]
-        perform_on_board(attempt, (r, c), dst, DEFAULT_DIRECTIONS, en_passant=state.get("en_passant"))
+        perform_on_board(attempt, (r, c), dst, DEFAULT_DIRECTIONS,
+                         en_passant=state.get("en_passant"),
+                         castle_rook=castling_target(state, r, c, *dst))
         if not in_check(attempt, state["active"], piece["color"], state["options"]): result.append(dst)
     return result
 
@@ -414,11 +448,13 @@ def move(state, start, end, promotion="Q"):
     if (rr, cc) not in legal_moves(state, r, c, state["turn"]): raise ValueError("Недопустимый ход или король под шахом")
     if promotion not in PROMOTIONS: raise ValueError("Допустимы только ферзь, ладья, слон и конь")
     actor = state["turn"]
-    captured = state["board"][rr][cc]
+    castling_rook = castling_target(state, r, c, rr, cc)
+    captured = state["board"][rr][cc] if castling_rook is None else None
     en_passant = state.get("en_passant")
     ep_capture = (piece["type"] == "P" and en_passant and en_passant["target"] == [rr, cc]
                   and c != cc and captured is None)
-    result = perform_on_board(state["board"], start, end, DEFAULT_DIRECTIONS, promotion, en_passant)
+    result = perform_on_board(state["board"], start, end, DEFAULT_DIRECTIONS,
+                              promotion, en_passant, castle_rook=castling_rook)
     state["en_passant"] = None
     if piece["type"] == "P" and abs(rr - r) + abs(cc - c) == 2 and (r == rr or c == cc):
         state["en_passant"] = {"target": [(r + rr) // 2, (c + cc) // 2], "pawn": [rr, cc], "color": actor}
@@ -427,7 +463,10 @@ def move(state, start, end, promotion="Q"):
                              'capture':bool(captured or ep_capture),
                              'promotion':promotion if result['promoted'] else None})
     state["history"] = state["history"][-250:]
-    state["last_move"] = {"from": [r, c], "to": [rr, cc]}
+    last_end = (home_square(actor, 2 if home_index(actor, *castling_rook, len(state['board'])) <
+                             home_index(actor, r, c, len(state['board'])) else 6,
+                             size=len(state['board'])) if castling_rook is not None else (rr, cc))
+    state["last_move"] = {"from": [r, c], "to": list(last_end)}
     state["move_count"] += 1
     advance_turn(state, actor)
     return state

@@ -5,10 +5,10 @@ services:
     runtime: python
     plan: free
     region: frankfurt
+    rootDir: BaldChess
     buildCommand: python -m compileall -q server.py engine.py
     startCommand: python server.py --no-browser
     healthCheckPath: /
     envVars:
       - key: PYTHONUNBUFFERED
         value: '1'
-    rootDir: BaldChess

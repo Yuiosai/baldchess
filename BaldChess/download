@@ -1,0 +1,9 @@
+# Player sessions / room database (contains secret tokens)
+data/rooms.sqlite3*
+data/*.db
+# Legacy storage and backups
+data/rooms.json
+__pycache__/
+*.py[cod]
+.env
+.venv/
