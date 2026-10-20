@@ -319,3 +319,62 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 .board.orientation-yellow .piece,.board.orientation-blue .piece,.board.orientation-green .piece,
 .board.orientation-yellow .coord,.board.orientation-blue .coord,.board.orientation-green .coord{transform:none!important}
 .board .square{transition:none}
+
+
+/* BaldChess 5.16.4 — mobile-first layout refinement; desktop unchanged. */
+/* Remove redundant invitation status and move counters in ALL layouts. */
+.board-footer,#invite-hint,#history-count{display:none!important}
+.mobile-duel-clock,.mobile-utilities{display:none}
+
+/* Center the illustrated logo in the welcome screen at narrow widths. */
+.welcome-mark{display:flex;align-items:center;justify-content:center;margin-inline:auto}
+.welcome-mark img{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center;transform:none}
+@media (max-width:640px){
+ .welcome{overflow-x:hidden;padding-inline:14px}
+ .welcome-inner{display:flex;flex-direction:column;align-items:center;width:100%;max-width:460px}
+ .welcome-mark{width:94px;height:94px;min-width:94px;min-height:94px;margin:0 auto 10px}
+ .welcome-mark img{width:100%;height:100%;object-fit:contain;object-position:center}
+ .welcome h1{font-size:clamp(38px,12vw,60px);white-space:nowrap;letter-spacing:-.075em;margin:5px auto 7px}
+ .welcome-inner>p{font-size:15px;margin:10px 0 20px}
+ .mode-cards{width:100%;margin:0 auto 14px}
+ .mode-card{min-width:0}
+ .welcome-lang{margin-top:18px}
+
+ /* Headline and lobby details move BELOW the board on phones. */
+ .page:not([hidden]){padding:8px 10px 14px}
+ .topbar{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding-bottom:8px}
+ .brand{justify-content:center;gap:9px}
+ .brand .logo{width:35px;height:35px;flex:none}
+ .brand .logo img{width:100%;height:100%;object-fit:contain}
+ .brand strong{font-size:18px}
+ .header-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+ .header-actions .button{min-width:0;padding:8px 6px}
+ .main-layout{padding-top:0}
+ .game-panel{display:flex;flex-direction:column;align-items:stretch;min-width:0;padding-block:9px 9px}
+ .game-header{order:4;align-self:stretch;min-height:0;padding:9px 3px 3px}
+ .game-header .eyebrow{font-size:11px;letter-spacing:.06em}
+ .room-tag{font-size:10px}
+ .board-wrapper{order:1;width:min(100%,calc(100dvh - 130px),780px);max-width:780px;min-width:0;margin:8px auto;align-self:center;transform:none!important}
+ .mobile-duel-clock:not([hidden]){display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;
+  order:0;width:min(100%,calc(100dvh - 130px),780px);max-width:780px;min-height:42px;
+  padding:6px 12px;margin:0 auto;border:1px solid #374b60;border-radius:9px;background:#1b2939;color:#e6eff7}
+ #mobile-duel-bottom:not([hidden]){order:2}
+ .mobile-duel-clock.is-turn{border-color:#84b6a1;background:#23384a}
+ .mobile-clock-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:650}
+ .mobile-clock-time{flex:none;margin-left:10px;font-size:19px;line-height:1.2;font-weight:800;font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+ .mobile-duel-clock.low-clock .mobile-clock-time{color:#ff8791}
+ .sidebar{margin-top:8px}
+ .mobile-utilities{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:15px 1px 9px;
+   padding:9px 11px;border:1px solid #354a60;border-radius:10px;background:#1b2939}
+ .mobile-utilities:empty{display:none}
+ .mobile-utilities .button{font-size:12px;min-width:0;flex:1 1 auto;padding:9px 10px}
+ .mobile-utilities select{width:106px;flex:0 0 106px;min-width:0;padding:9px 8px;
+  color:#ebf7fc;background:#1d3042;border:1px solid #496477;border-radius:8px}
+}
+@media (max-width:360px){
+ .welcome-mark{width:84px;height:84px;min-width:84px;min-height:84px}
+ .welcome h1{font-size:clamp(32px,11.5vw,42px)}
+ .mobile-clock-name{font-size:12px}
+ .mobile-utilities{gap:7px;padding:8px}
+ .mobile-utilities select{width:92px;flex-basis:92px}
+}
