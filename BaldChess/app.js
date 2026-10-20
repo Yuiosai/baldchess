@@ -1,6 +1,8 @@
 // BaldChess UI: English and Russian, responsive boards, draggable vector pieces.
 (()=>{
  const $=id=>document.getElementById(id);
+ // Transitional DOM safety: an older cached page or script should not break room creation.
+ const setHidden=(id,value)=>{const node=$(id);if(node)node.hidden=Boolean(value);};
  const LANG={
  en:{pickMode:'Choose your battlefield',duel:'1 VS 1',four:'4 PLAYERS',duelDesc:'Classic 8 × 8 board · 2 players',fourDesc:'Cross-shaped 14 × 14 board',language:'Language',tagline:'MULTIPLAYER CHESS',joinCode:'Join with room code',newLobby:'+ New lobby',createOrJoin:'Create a lobby or join using a code',turnNow:'TO MOVE',players:'Players',lobby:'Lobby',invite:'Share this code with your friends.',copyLink:'Copy invite link',editLobby:'⚙ Edit lobby settings',piecesDesign:'Piece designs',mySkin:'My pieces (visible to everyone)',myColor:'My piece color',uniform:'Show all pieces in one style (only for me)',history:'Move history',resign:'Resign',rematch:'↻ Rematch',noAccounts:'No accounts or registration. Your seat is saved in this browser. If someone disconnects, the host can play for them.',joinRoom:'Join a lobby',enterCode:'Enter the 6-character room code and your nickname.',code:'Room code',nickname:'Nickname',join:'Join',setup:'Starting position',classic:'Classic',fischer:'Fischer random',custom:'Custom board',format:'Game format',teams:'Teams',minutes:'Time per player',unlimited:'Unlimited',increment:'Time increment',noIncrement:'None',allowPremoves:'Allow premoves',differentClocks:'Different time for each player',teamsHelp:'Allies cannot capture each other. Last surviving team wins.',boardEditor:'Board editor',oneKing:'Exactly one king per color',color:'Color',piece:'Piece',restore:'Restore default',clear:'Clear',createLobby:'Create lobby',promotion:'Pawn promotion',choosePiece:'Choose a piece:',queen:'♛ Queen',rook:'♜ Rook',bishop:'♝ Bishop',knight:'♞ Knight',cancel:'Cancel',red:'Red',blue:'Blue',yellow:'Yellow',green:'Green',king:'King',pawn:'Pawn',erase:'Eraser',save:'Save settings',settings:'Room settings',waiting:'Waiting for players',ready:'Your turn',opponent:'Waiting for opponent',check:'Check! Protect your king',premoveAllowed:'You can make a premove',premoveSaved:'Premove queued. It will execute when your turn begins, if still legal.',finished:'Game over',win:'Winner',draw:'Draw',notConnected:'Not connected',disconnected:'Offline',connected:'Online',eliminated:'Eliminated',you:'You',controlling:'Host controlling',takeover:'Take control',release:'Release control',takeoverHint:'Host takeover available after 12 seconds offline.',room:'Room',inviteOthers:'Invite the remaining players',copy:'Copied!',moves:'Moves',entries:'entries',noMoves:'Moves will appear here',start:'All players joined. Game started!',castle:'castling',capture:'capture',checkmate:'checkmate',stalemate:'stalemate',timeout:'time ran out',resigned:'resigned',premovesOn:'premoves on',premovesOff:'no premoves',noClock:'no clock',individual:'individual clocks',classicSetup:'Classic',fischerSetup:'Fischer',customSetup:'Custom',ffa:'Free-for-All',teamsMode:'Teams',lobbyPhase:'Lobby',playingPhase:'Playing',endPhase:'Finished',confirmRematch:'Restart this game with the same settings?',confirmResign:'Resign this game?',enterValidCode:'Enter a valid 6-character code.',needTeams:'Choose at least two teams.',needKings:'Exactly one king required for:',selectSkin:'Choose a style',noControl:'You cannot control this color.',error:'Error',spectator:'Spectator',minute:'min',waitSlots:'Waiting',dragon:'Dragon Realm',fortress:'Iron Citadel',cosmos:'Cosmic',mystic:'Arcane',pixel:'Pixel Heroes',skinClassic:'Classic',copyPrompt:'Copy this link:',host:'Host',oneVsOne:'1 VS 1',fourPlayers:'4 PLAYERS',noMovesHint:'Click or drag a piece to move.',stay:'A returning player regains their pieces automatically.'},
  ru:{pickMode:'Выбери режим игры',duel:'1 НА 1',four:'4 ИГРОКА',duelDesc:'Обычная доска 8 × 8 · 2 игрока',fourDesc:'Крестообразная доска 14 × 14',language:'Язык',tagline:'СЕТЕВЫЕ ШАХМАТЫ',joinCode:'Войти по коду комнаты',newLobby:'+ Новое лобби',createOrJoin:'Создай комнату или войди по коду',turnNow:'СЕЙЧАС ХОДЯТ',players:'Игроки',lobby:'Лобби',invite:'Отправь код друзьям.',copyLink:'Скопировать ссылку',editLobby:'⚙ Настройки лобби',piecesDesign:'Стили фигур',mySkin:'Мои фигуры (видны всем)',myColor:'Цвет моих фигур',uniform:'Показывать все фигуры в одном стиле (только у меня)',history:'История ходов',resign:'Сдаться',rematch:'↻ Новая партия',noAccounts:'Без аккаунтов и регистрации. Место сохраняется в этом браузере. За отключившихся игроков может играть хост.',joinRoom:'Войти в лобби',enterCode:'Введи шестизначный код комнаты и своё имя.',code:'Код комнаты',nickname:'Имя игрока',join:'Войти',setup:'Расстановка',classic:'Классическая',fischer:'Фишер (случайная)',custom:'Своя расстановка',format:'Формат',teams:'Команды',minutes:'Время на игрока',unlimited:'Без ограничений',increment:'Прибавка за ход',noIncrement:'Без прибавки',allowPremoves:'Разрешить премувы',differentClocks:'Разное время для игроков',teamsHelp:'Союзники не бьют друг друга. Побеждает последняя оставшаяся команда.',boardEditor:'Редактор расстановки',oneKing:'Ровно один король каждого цвета',color:'Цвет',piece:'Фигура',restore:'Стандартная',clear:'Очистить',createLobby:'Создать лобби',promotion:'Превращение пешки',choosePiece:'Выбери фигуру:',queen:'♛ Ферзь',rook:'♜ Ладья',bishop:'♝ Слон',knight:'♞ Конь',cancel:'Отмена',red:'Красные',blue:'Синие',yellow:'Жёлтые',green:'Зелёные',king:'Король',pawn:'Пешка',erase:'Ластик',save:'Сохранить настройки',settings:'Настройки комнаты',waiting:'Ожидание игроков',ready:'Твой ход',opponent:'Ожидание соперника',check:'Шах! Защити короля',premoveAllowed:'Можно поставить премув',premoveSaved:'Премув записан. Он выполнится в твой ход, если останется допустимым.',finished:'Партия завершена',win:'Победа',draw:'Ничья',notConnected:'Не подключён',disconnected:'Не в сети',connected:'В игре',eliminated:'Выбыл',you:'Ты',controlling:'Управляет хост',takeover:'Взять управление',release:'Вернуть управление',takeoverHint:'Хост может взять чужой цвет после 12 секунд отсутствия игрока.',room:'Комната',inviteOthers:'Пригласи остальных',copy:'Скопировано!',moves:'Ходов',entries:'записей',noMoves:'Здесь появятся ходы',start:'Все игроки подключились. Партия началась!',castle:'рокировка',capture:'взятие',checkmate:'мат',stalemate:'пат',timeout:'время вышло',resigned:'сдался',premovesOn:'премувы включены',premovesOff:'без премувов',noClock:'без часов',individual:'индивидуальные часы',classicSetup:'Классика',fischerSetup:'Фишер',customSetup:'Своя доска',ffa:'Free-for-All',teamsMode:'Команды',lobbyPhase:'Лобби',playingPhase:'Игра',endPhase:'Завершена',confirmRematch:'Начать новую партию с теми же настройками?',confirmResign:'Сдаться и выбыть из партии?',enterValidCode:'Введите правильный шестизначный код.',needTeams:'Нужно минимум две разные команды.',needKings:'Нужен ровно один король цвета:',selectSkin:'Выбери стиль',noControl:'Нельзя управлять этим цветом.',error:'Ошибка',spectator:'Зритель',minute:'мин',waitSlots:'Ожидание',dragon:'Драконье королевство',fortress:'Железная крепость',cosmos:'Космос',mystic:'Магия',pixel:'Пиксельные герои',skinClassic:'Классика',copyPrompt:'Скопируй ссылку:',host:'Хост',oneVsOne:'1 НА 1',fourPlayers:'4 ИГРОКА',noMovesHint:'Выбери или перетащи фигуру.',stay:'Вернувшийся игрок автоматически получит свой цвет обратно.'}
@@ -239,17 +241,17 @@
   maybePlayMoveSound(room);
   renderBoard(room,selected,moves,premove);
   animateLastMove(room);
-  const has=Boolean(room);$('welcome').hidden=!showWelcome;$('game-page').hidden=showWelcome||!has;$('back-to-game').hidden=!has;$('loading').hidden=has;
-  $('invite-panel').hidden=!has;$('appearance-card').hidden=!has;
+  const has=Boolean(room);setHidden('welcome',!showWelcome);setHidden('game-page',showWelcome||!has);setHidden('back-to-game',!has);setHidden('loading',has);
+  setHidden('invite-panel',!has);setHidden('appearance-card',!has);
   $('resign-button').disabled=!has||room.state.status!=='playing'||room.role==='spectator'||!room.state.active[room.role];
   $('reset-button').disabled=!has||room.role!=='red';
   if(!has)return;
   chosenMode=room.state.options.mode;
   const s=room.state,opts=s.options,waiting=s.status==='waiting',done=s.status==='finished',list=players(opts.mode),myTurn=ChessGame.controlled(s.turn);
   // Keep the move history visible in the lobby and during play.
-  $('history-card').hidden=false;
+  setHidden('history-card',false);
   $('invite-panel').classList.toggle('compact-lobby',!waiting);
-  $('show-player-themes').closest('label').title=t('showPlayerHelp');
+  if($('show-player-themes')?.closest('label'))$('show-player-themes').closest('label').title=t('showPlayerHelp');
   $('game-mode').textContent=opts.mode==='duel'?t('oneVsOne'):opts.format==='teams'?t('teamsHeader'):t('freeForAllHeader');
   $('game-title').textContent=opts.variant==='fischer'?t('fischer'):opts.variant==='custom'?t('custom'):'BALDCHESS';
   $('mode-label').textContent=t('room')+' '+room.code;
@@ -260,7 +262,7 @@
   $('move-counter').textContent=t('moves')+': '+s.move_count;
   $('player-count').textContent=room.joined+' / '+list.length;
   $('room-code').textContent=room.code;
-  $('edit-settings').hidden=!(room.role==='red'&&waiting);
+  setHidden('edit-settings',!(room.role==='red'&&waiting));
   $('customize-button').disabled=room.role==='spectator';
   $('room-options-summary').textContent=[t({classic:'classicSetup',fischer:'fischerSetup',custom:'customSetup'}[opts.variant]),opts.mode==='duel'?t('oneVsOne'):opts.format==='teams'?t('teamsMode'):t('ffa'),opts.seat_minutes?t('individual'):opts.minutes?opts.minutes+' '+t('minute'):t('noClock'),opts.premoves?t('premovesOn'):t('premovesOff')].join(' · ');
   $('invite-hint').textContent=waiting?t('inviteOthers'):t('stay');
@@ -295,16 +297,16 @@
  for(const c of ChessBoard.COLORS){let opt=document.createElement('option');opt.value=c;$('editor-color').append(opt);}
  for(const kind of ['K','Q','R','B','N','P','erase']){let opt=document.createElement('option');opt.value=kind;$('editor-piece').append(opt);}
  function setModeUI(){
-  const duel=chosenMode==='duel';$('format-field').hidden=duel;$('team-settings').hidden=duel||$('format-select').value!=='teams';
-  for(const c of ChessBoard.COLORS){$('time-label-'+c).parentElement.hidden=duel&&!['red','yellow'].includes(c);$('team-label-'+c).parentElement.hidden=duel;}
+  const duel=chosenMode==='duel';setHidden('format-field',duel);setHidden('team-settings',duel||$('format-select').value!=='teams');
+  for(const c of ChessBoard.COLORS){const clock=$('time-label-'+c)?.parentElement,team=$('team-label-'+c)?.parentElement;if(clock)clock.hidden=duel&&!['red','yellow'].includes(c);if(team)team.hidden=duel;}
   for(const c of ChessBoard.COLORS) $('editor-color').querySelector(`option[value="${c}"]`).hidden=duel&&!['red','yellow'].includes(c);
   if(duel&&!['red','yellow'].includes($('editor-color').value))$('editor-color').value='red';
-  $('custom-settings').hidden=$('setup-select').value!=='custom';
+  setHidden('custom-settings',$('setup-select').value!=='custom');
   renderEditor();
  }
  function fillOptions(opts){
   $('setup-select').value=opts.variant;$('format-select').value=opts.format;$('minutes-select').value=opts.minutes;$('increment-select').value=opts.increment;
-  $('allow-premoves').checked=opts.premoves;$('separate-clocks').checked=Boolean(opts.seat_minutes);$('seat-clock-settings').hidden=!opts.seat_minutes;
+  $('allow-premoves').checked=opts.premoves;$('separate-clocks').checked=Boolean(opts.seat_minutes);setHidden('seat-clock-settings',!opts.seat_minutes);
   for(const c of ChessBoard.COLORS){$('team-'+c).value=opts.teams[c];$('seat-time-'+c).value=opts.seat_minutes?.[c]||opts.minutes||10;}
   editor.board=opts.custom_board?JSON.parse(JSON.stringify(opts.custom_board)):ChessBoard.startBoard(chosenMode);
   setModeUI();
@@ -318,7 +320,7 @@
  function openSettings(edit=false){
   editing=edit;const room=ChessGame.get().room;if(edit&&room)chosenMode=room.state.options.mode;
   $('settings-title').textContent=edit?t('settings'):t('createLobby');$('save-settings').textContent=edit?t('save'):t('createLobby');
-  $('host-name-field').hidden=edit;$('settings-error').textContent='';
+  setHidden('host-name-field',edit);$('settings-error').textContent='';
   if(!edit)$('host-name').value=rememberedNickname()||'Player 1';
   if(edit&&room)fillOptions(room.state.options);else fillOptions({variant:'classic',format:'ffa',minutes:10,increment:0,premoves:true,teams:{red:0,blue:1,yellow:2,green:3},seat_minutes:null});
   $('settings-dialog').showModal();
@@ -331,7 +333,7 @@
  $('close-settings').addEventListener('click',()=>$('settings-dialog').close());
  $('setup-select').addEventListener('change',setModeUI);
  $('format-select').addEventListener('change',setModeUI);
- $('separate-clocks').addEventListener('change',()=>{$('seat-clock-settings').hidden=!$('separate-clocks').checked;});
+ $('separate-clocks').addEventListener('change',()=>{setHidden('seat-clock-settings',!$('separate-clocks').checked);});
  document.querySelectorAll('.team-preset').forEach(el=>el.addEventListener('click',()=>{const preset={two:[0,1,0,1],three:[0,0,0,1],split:[0,1,0,2]}[el.dataset.preset];ChessBoard.COLORS.forEach((c,i)=>{$('team-'+c).value=preset[i];});}));
  $('editor-clear').addEventListener('click',()=>{editor.board=Array.from({length:editorSize},()=>Array(editorSize).fill(null));renderEditor();});
  $('editor-standard').addEventListener('click',()=>{editor.board=ChessBoard.startBoard(chosenMode);renderEditor();});
@@ -368,7 +370,7 @@
  $('reset-button').addEventListener('click',()=>{if(confirm(t('confirmRematch')))ChessGame.action('reset').catch(err=>toast(serverError(err.message)));});
 
  // One local switch: show the board portions and custom pieces chosen by other players.
- $('sound-enabled').addEventListener('change',e=>ChessAudio.setEnabled(e.target.checked));
+ $('sound-enabled')?.addEventListener('change',e=>ChessAudio.setEnabled(e.target.checked));
  $('show-player-themes').addEventListener('change',()=>{
   showPlayerThemes=$('show-player-themes').checked;save('baldchess_show_player_themes',String(showPlayerThemes));
   const g=ChessGame.get();renderBoard(g.room,g.selected,g.moves,g.premove);
@@ -462,7 +464,7 @@
  // Default is English, regardless of the operating-system language.
  language=load('baldchess_language','en');if(language!=='ru')language='en';showPlayerThemes=load('baldchess_show_player_themes','true')!=='false';
  $('show-player-themes').checked=showPlayerThemes;
- $('sound-enabled').checked=ChessAudio.isEnabled();
+ if($('sound-enabled'))$('sound-enabled').checked=ChessAudio.isEnabled();
  translate();
  ChessGame.bootstrap().then(result=>{
   if(result.joined){showWelcome=false;const resumed=ChessGame.get().room;saveNickname(resumed?.seats?.[resumed.role]);}

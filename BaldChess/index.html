@@ -16,8 +16,8 @@
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="BaldChess — Play Chess Together">
 <meta name="twitter:description" content="Free online chess for two or four players.">
 <title translate="no">BaldChess — Free Online Chess for 2 or 4 Players</title>
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=516">
-<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=516" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=516" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=5161">
+<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=5161" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=5161" defer></script>
 </head><body>
 <section class="welcome" id="welcome" aria-label="Choose game mode">
  <div class="welcome-inner">
@@ -74,5 +74,6 @@
 <button type="button" class="button primary full" id="apply-appearance" data-t="applyAppearance">Apply this look</button>
 </dialog>
 <dialog id="promotion-dialog" class="dialog"><h2 data-t="promotion">Pawn promotion</h2><p data-t="choosePiece">Choose a piece:</p><div class="promotion-choices" id="promotion-choices"><button class="button outline" data-promotion="Q" data-t="queen">♛ Queen</button><button class="button outline" data-promotion="R" data-t="rook">♜ Rook</button><button class="button outline" data-promotion="B" data-t="bishop">♝ Bishop</button><button class="button outline" data-promotion="N" data-t="knight">♞ Knight</button></div></dialog>
+<div id="premove-bar" hidden aria-hidden="true" style="display:none!important"><span id="premove-message"></span><button id="cancel-premove" type="button" tabindex="-1" hidden>Cancel premove</button></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body></html>
