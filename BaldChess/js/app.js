@@ -43,6 +43,70 @@
   const pick=e=>{const btn=e.target.closest('[data-promotion]');if(btn)finish(btn.dataset.promotion);};
   const closed=()=>finish('Q');d.addEventListener('click',pick);d.addEventListener('close',closed);d.showModal();
  })};
+
+ const ChessAudio=(()=>{
+  let ctx=null,noiseBuffer=null;
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  const enable=()=>{if(!AudioCtor)return null;ctx??=new AudioCtor();if(ctx.state==='suspended')ctx.resume().catch(()=>{});if(!noiseBuffer&&ctx){noiseBuffer=ctx.createBuffer(1,ctx.sampleRate*.18,ctx.sampleRate);const d=noiseBuffer.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);}return ctx;};
+  const unlock=()=>enable();
+  window.addEventListener('pointerdown',unlock,{passive:true});
+  window.addEventListener('keydown',unlock);
+  function env(gain,time,peak=.16,attack=.005,decay=.12){
+   gain.gain.cancelScheduledValues(time);
+   gain.gain.setValueAtTime(0.0001,time);
+   gain.gain.linearRampToValueAtTime(peak,time+attack);
+   gain.gain.exponentialRampToValueAtTime(0.0001,time+Math.max(attack+.02,decay));
+  }
+  function tone(opts={}){
+   const ac=enable(); if(!ac) return;
+   const now=ac.currentTime+(opts.delay||0),osc=ac.createOscillator(),gain=ac.createGain(),filter=ac.createBiquadFilter();
+   osc.type=opts.type||'triangle';
+   osc.frequency.setValueAtTime(opts.freq||330,now);
+   if(opts.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(40,opts.slide),now+(opts.duration||0.12));
+   filter.type=opts.filterType||'lowpass'; filter.frequency.value=opts.filter||2200; filter.Q.value=opts.q||0.2;
+   env(gain,now,opts.gain||.12,opts.attack||.003,opts.duration||.12);
+   osc.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+   osc.start(now); osc.stop(now+(opts.duration||.12)+.03);
+  }
+  function noise(opts={}){
+   const ac=enable(); if(!ac||!noiseBuffer) return;
+   const now=ac.currentTime+(opts.delay||0),src=ac.createBufferSource(),filter=ac.createBiquadFilter(),gain=ac.createGain();
+   src.buffer=noiseBuffer;
+   filter.type=opts.filterType||'bandpass'; filter.frequency.value=opts.filter||1400; filter.Q.value=opts.q||1.2;
+   env(gain,now,opts.gain||.06,opts.attack||.001,opts.duration||.08);
+   src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
+   src.start(now); src.stop(now+(opts.duration||.08)+.03);
+  }
+  const profiles={
+   classic:meta=>{tone({type:'triangle',freq:460,slide:390,duration:.09,gain:.12,filter:1800});if(meta.capture)tone({type:'sine',freq:250,slide:190,delay:.03,duration:.11,gain:.07,filter:900});if(meta.check)tone({type:'sine',freq:760,delay:.06,duration:.08,gain:.055,filter:2400});},
+   dragons:meta=>{tone({type:'sawtooth',freq:182,slide:140,duration:.16,gain:.1,filter:900});noise({filter:720,delay:.016,duration:.055,gain:.038,q:.9});if(meta.capture)tone({type:'triangle',freq:130,slide:98,delay:.045,duration:.16,gain:.07,filter:700});},
+   fortress:meta=>{tone({type:'square',freq:320,slide:300,duration:.07,gain:.08,filter:2600});tone({type:'triangle',freq:510,slide:430,delay:.014,duration:.11,gain:.06,filter:2200});if(meta.capture||meta.castle)tone({type:'square',freq:640,slide:500,delay:.05,duration:.12,gain:.05,filter:2800});},
+   cosmos:meta=>{tone({type:'sine',freq:560,slide:710,duration:.18,gain:.08,filter:3200});tone({type:'triangle',freq:310,slide:450,delay:.032,duration:.18,gain:.04,filter:2400});if(meta.check)tone({type:'sine',freq:930,delay:.08,duration:.12,gain:.04,filter:3600});},
+   mystic:meta=>{tone({type:'triangle',freq:540,slide:470,duration:.2,gain:.08,filter:2300});tone({type:'sine',freq:810,slide:750,delay:.028,duration:.18,gain:.05,filter:3000});if(meta.capture)tone({type:'sine',freq:360,slide:290,delay:.055,duration:.14,gain:.045,filter:1800});},
+   celestial:meta=>{tone({type:'sine',freq:520,slide:600,duration:.16,gain:.08,filter:2600});tone({type:'triangle',freq:780,slide:690,delay:.022,duration:.16,gain:.045,filter:2900});if(meta.check)tone({type:'sine',freq:980,delay:.075,duration:.1,gain:.04,filter:3500});},
+   abyss:meta=>{tone({type:'triangle',freq:220,slide:170,duration:.16,gain:.1,filter:900});tone({type:'sine',freq:145,slide:120,delay:.028,duration:.18,gain:.045,filter:700});if(meta.capture)noise({filter:540,delay:.04,duration:.06,gain:.03,q:.7});},
+   pixel:meta=>{tone({type:'square',freq:660,slide:560,duration:.05,gain:.08,filter:4000});tone({type:'square',freq:520,slide:440,delay:.045,duration:.05,gain:.05,filter:3500});if(meta.capture)tone({type:'square',freq:260,slide:180,delay:.085,duration:.07,gain:.05,filter:2600});}
+  };
+  function playMove(appearance,meta={}){
+   const skin=ChessThemes.get(appearance||'palette:classic').skin||'classic';
+   (profiles[skin]||profiles.classic)(meta);
+  }
+  return {playMove};
+ })();
+ let lastMoveSoundSignature='';
+ function maybePlayMoveSound(room){
+  if(!room?.state){lastMoveSoundSignature='';return;}
+  const s=room.state,move=s.last_move;
+  if(!move||!s.move_count)return;
+  const moveItem=[...s.history].reverse().find(item=>item&&typeof item==='object'&&item.kind==='move');
+  const mover=moveItem?.color||null;
+  const signature=[room.code,s.move_count,move.from?.join('-')||'',move.to?.join('-')||'',mover||''].join('|');
+  if(!lastMoveSoundSignature||!lastMoveSoundSignature.startsWith(room.code+'|')){lastMoveSoundSignature=signature;return;}
+  if(signature===lastMoveSoundSignature)return;
+  lastMoveSoundSignature=signature;
+  const appearance=room.appearances?.[mover]||'palette:classic';
+  ChessAudio.playMove(appearance,{capture:Boolean(moveItem?.capture),castle:Boolean(moveItem?.castle),promotion:Boolean(moveItem?.promotion),check:Object.values(s.checks||{}).some(Boolean)});
+ }
  function pieceSpan(p,skin,color,dead=false){
   const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin));return el;
  }
@@ -147,6 +211,7 @@
  }
 
  function render(room,selected,moves,premove){
+  maybePlayMoveSound(room);
   renderBoard(room,selected,moves,premove);
   const has=Boolean(room);$('welcome').hidden=!showWelcome;$('game-page').hidden=showWelcome||!has;$('back-to-game').hidden=!has;$('loading').hidden=has;
   $('invite-panel').hidden=!has;$('appearance-card').hidden=!has;
