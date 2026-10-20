@@ -220,9 +220,36 @@
   }
  }
  function clockText(seconds){const n=Math.max(0,Math.ceil(seconds));return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
- function updateClock(){const {room}=ChessGame.get();if(!room?.state.clock)return;const s=room.state;for(const c of players(s.options.mode)){
-  const el=$('clock-'+c);if(!el)continue;let n=s.clock[c];if(s.turn===c&&s.status==='playing')n-=Math.max(0,(Date.now()-room.seenAt)/1000);el.textContent=clockText(n);el.classList.toggle('low-clock',n<=20&&s.active[c]);
- }}
+ function currentSeconds(room,color){
+  const s=room.state;if(!s.clock)return null;
+  let n=Number(s.clock[color]??0);
+  if(s.turn===color&&s.status==='playing')n-=Math.max(0,(Date.now()-room.seenAt)/1000);
+  return Math.max(0,n);
+ }
+ function updateMobileDuelClocks(room){
+  if(!room||room.state.options.mode!=='duel')return;
+  // Each player sees their own pieces at the bottom of the board.
+  const bottom=room.role==='yellow'?'yellow':'red';
+  const top=bottom==='red'?'yellow':'red';
+  for(const [side,color] of [['top',top],['bottom',bottom]]){
+   const bar=$('mobile-duel-'+side),name=$('mobile-duel-'+side+'-name'),time=$('mobile-duel-'+side+'-time');
+   if(!bar||!name||!time)continue;
+   const seconds=currentSeconds(room,color);
+   const value=seconds===null?'∞':clockText(seconds);
+   if(name.textContent!==playerName(room,color))name.textContent=playerName(room,color);
+   if(time.textContent!==value)time.textContent=value;
+   bar.classList.toggle('is-turn',room.state.turn===color&&room.state.status==='playing');
+   bar.classList.toggle('low-clock',seconds!==null&&seconds<=20&&room.state.active[color]);
+  }
+ }
+ function updateClock(){const {room}=ChessGame.get();if(!room)return;
+  if(room.state.clock)for(const c of players(room.state.options.mode)){
+   const el=$('clock-'+c);if(!el)continue;
+   const n=currentSeconds(room,c);el.textContent=clockText(n);
+   el.classList.toggle('low-clock',n<=20&&room.state.active[c]);
+  }
+  updateMobileDuelClocks(room);
+ }
  function historyText(item,room){
   if(typeof item==='string'){
    const match=item.match(/^(Красные|Синие|Жёлтые|Зелёные): ([a-n]\d+) → ([a-n]\d+)(.*)$/);
@@ -284,6 +311,10 @@
   animateLastMove(room);
   const has=Boolean(room);setHidden('welcome',!showWelcome);setHidden('game-page',showWelcome||!has);setHidden('back-to-game',!has);setHidden('loading',has);
   setHidden('invite-panel',!has);setHidden('appearance-card',!has);
+  const duelMobileClocks=Boolean(has&&room.state.options.mode==='duel');
+  setHidden('mobile-duel-top',!duelMobileClocks);
+  setHidden('mobile-duel-bottom',!duelMobileClocks);
+  $('game-page').classList.toggle('duel-mode',duelMobileClocks);
   $('resign-button').disabled=!has||room.state.status!=='playing'||room.role==='spectator'||!room.state.active[room.role];
   $('reset-button').disabled=!has||room.role!=='red';
   if(!has)return;
@@ -466,6 +497,26 @@
  });
  $('language-select').addEventListener('change',e=>setLanguage(e.target.value));
  $('language-in-game').addEventListener('change',e=>setLanguage(e.target.value));
+ // Keep the top of the mobile game board uncluttered. Move existing controls,
+ // retaining their event handlers and state (never duplicate select IDs).
+ const mobileLayout=window.matchMedia('(max-width: 640px)');
+ function arrangeMobileControls(){
+  const toolbar=document.querySelector('.header-actions');
+  const lower=$('mobile-utilities');
+  const customize=$('customize-button'),languageSelect=$('language-in-game');
+  const join=$('join-button');
+  if(!toolbar||!lower||!customize||!languageSelect||!join)return;
+  if(mobileLayout.matches){
+   if(customize.parentElement!==lower)lower.append(customize);
+   if(languageSelect.parentElement!==lower)lower.append(languageSelect);
+  }else{
+   if(customize.parentElement!==toolbar)toolbar.insertBefore(customize,join);
+   if(languageSelect.parentElement!==toolbar)toolbar.insertBefore(languageSelect,join);
+  }
+ }
+ arrangeMobileControls();
+ if(mobileLayout.addEventListener)mobileLayout.addEventListener('change',arrangeMobileControls);
+ else mobileLayout.addListener(arrangeMobileControls);
  // Pointer-controlled dragging works with mouse and touch, without disabling click-to-move.
  let ignoreClick=false,drag=null;
  const boardEl=$('board');
