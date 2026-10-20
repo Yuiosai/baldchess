@@ -290,3 +290,11 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
  .board-wrapper{transform:translateY(-6px)}
  .board-footer{padding:3px 3px 0}
 }
+
+/* BaldChess 5.15 — a single cohesive hand-inked piece style for every palette
+   and themed skin. The viewBox / base proportions are the same in both modes. */
+.board .square .piece{width:95%;height:95%}
+.board .square .piece .art{transform:scale(1.065);transform-origin:center;filter:drop-shadow(0 1px 1px #0b111a9f) drop-shadow(0 3px 3px #090d1666)}
+.board .square .piece .art svg{display:block;width:100%;height:100%;overflow:visible}
+.editor-board .piece .art,.mini-square .piece .art,.appearance-swatches .piece .art{filter:drop-shadow(0 2px 2px #060b134d)}
+.editor-board .piece .art svg,.mini-square .piece .art svg,.appearance-swatches .piece .art svg{overflow:visible}
