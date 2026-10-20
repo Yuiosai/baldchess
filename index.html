@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- BaldChess is a proper brand name. Our built-in RU/EN selector handles localization; avoid automatic machine translation. -->
+<meta name="google" content="notranslate">
+<meta name="theme-color" content="#88a8c8">
+<meta name="description" content="BaldChess — free online chess for 2 or 4 players. Play with friends in private rooms, choose chess sets, set clocks and customize your board.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://baldchess.com/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="BaldChess">
+<meta property="og:title" content="BaldChess — Online Chess for 2 or 4 Players">
+<meta property="og:description" content="Free multiplayer chess. Create a private room, invite your friends and play 1v1 or four-player chess.">
+<meta property="og:url" content="https://baldchess.com/">
+<meta property="og:image" content="https://baldchess.com/assets/logo.png">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="BaldChess — Play Chess Together">
+<meta name="twitter:description" content="Free online chess for two or four players.">
+<title translate="no">BaldChess — Free Online Chess for 2 or 4 Players</title>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=516">
+<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=516" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=516" defer></script>
+</head><body>
+<section class="welcome" id="welcome" aria-label="Choose game mode">
+ <div class="welcome-inner">
+  <div class="welcome-mark"><img src="/assets/logo.png" alt="BaldChess logo" translate="no" class="notranslate"></div>
+  <h1 class="notranslate" translate="no">BALD<span>CHESS</span></h1><p data-t="pickMode">Choose your battlefield</p>
+  <div class="mode-cards">
+   <button class="mode-card" id="choose-duel"><span class="mode-visual mode-duel">♜ <b>VS</b> ♞</span><strong data-t="duel">1 VS 1</strong><small data-t="duelDesc">Classic 8 × 8 board · 2 players</small></button>
+   <button class="mode-card" id="choose-four"><span class="mode-visual mode-four">♜ ♞<br>♝ ♛</span><strong data-t="four">4 PLAYERS</strong><small data-t="fourDesc">Cross-shaped 14 × 14 board</small></button>
+  </div>
+  <button id="welcome-join" class="button outline" data-t="joinCode">Join with room code</button><button id="back-to-game" class="button outline" data-t="backToGame" hidden>Back to current game</button>
+  <div class="welcome-lang"><label for="language-select" data-t="language">Language</label><select id="language-select"><option value="en">English</option><option value="ru">Русский</option></select></div>
+ </div>
+</section>
+<div class="page" id="game-page" hidden>
+<header class="topbar"><div class="brand"><div class="logo"><img src="/assets/logo.png" alt="BaldChess logo" translate="no" class="notranslate"></div><div><strong class="notranslate" translate="no">BALD<span>CHESS</span></strong></div></div>
+<div class="header-actions"><button class="button outline" id="customize-button" data-t="customize">Customize Board</button><select id="language-in-game" aria-label="Language"><option value="en">English</option><option value="ru">Русский</option></select><button class="button outline" id="join-button" data-t="joinCode">Join room</button><button class="button primary" id="create-button" data-t="newLobby">+ New lobby</button></div></header>
+<main class="main-layout">
+<section class="game-panel"><div class="game-header"><div><span class="eyebrow game-mode-big" id="game-mode">FREE FOR ALL · 4 PLAYERS</span><h1 id="game-title" class="notranslate" translate="no" hidden>BALDCHESS</h1></div><div class="room-tag"><span class="pulse"></span><span id="mode-label">—</span></div></div>
+<div class="board-wrapper"><div id="board" class="board" role="group" aria-label="Chess board"></div><div class="board-loading" id="loading" data-t="createOrJoin">Create a lobby or join using a code</div></div>
+<div class="board-footer"><span id="status-message">—</span><span id="move-counter" class="subtle">—</span></div>
+</section>
+<aside class="sidebar">
+<section class="side-card turn-card"><div class="section-top"><span class="eyebrow" data-t="turnNow">TO MOVE</span><span id="turn-phase" class="small-indicator">LOBBY</span></div><div class="current-player"><div><h2 id="turn-name">—</h2><p id="turn-detail">—</p></div></div></section>
+<section class="side-card"><div class="section-top"><h3 data-t="players">Players</h3><span class="side-note" id="player-count">0 / 4</span></div><div id="players" class="players"></div></section>
+<section class="side-card history-card" id="history-card"><div class="section-top"><h3 data-t="history">Move history</h3><span id="history-count" class="side-note">0</span></div><ol id="history" class="history"></ol></section>
+<section class="side-card" id="invite-panel" hidden><div class="section-top"><h3 data-t="lobby">Lobby</h3><span class="tiny-badge" data-t="online">ONLINE</span></div><p class="helper" id="invite-hint" data-t="invite">Share this code with your friends.</p><button id="copy-room" class="copy-code" title="Copy room code"><span id="room-code">------</span><span>⧉</span></button><button class="button outline full" id="copy-link" data-t="copyLink">Copy invite link</button><div class="options-summary" id="room-options-summary"></div><button class="button outline full" id="edit-settings" hidden data-t="editLobby">⚙ Edit lobby settings</button></section>
+<section class="side-card display-card" id="appearance-card" hidden>
+ <div class="section-top"><h3 data-t="displayOptions">Display</h3></div>
+ <label class="checkline display-toggle" title="Show other players’ themes or use only your own"><input type="checkbox" id="show-player-themes" checked><span data-t="showPlayerSkins">Show other players’ skins</span></label>
+ <label class="checkline display-toggle" title="Mute chess move sounds"><input type="checkbox" id="sound-enabled" checked><span data-t="playSounds">Move sounds</span></label>
+ <p class="helper" data-t="showPlayerHelp">Turn off to display the entire board and all pieces in your chosen style. Other players are unaffected.</p>
+</section>
+<div class="bottom-actions"><button class="button outline danger" id="resign-button" disabled data-t="resign">Resign</button><button class="button outline" id="reset-button" disabled data-t="rematch">↻ Rematch</button></div>
+<p class="fineprint" data-t="noAccounts">No accounts. Seats are restored using a token saved in this browser. If a player goes offline, the host can take over their pieces.</p>
+</aside></main><footer class="footer"><span class="notranslate" translate="no">BALDCHESS</span> <span>·</span> <span data-t="footer">ONLINE · CHESS</span></footer></div>
+<dialog id="join-dialog" class="dialog"><form id="join-form"><div class="dialog-head"><h2 data-t="joinRoom">Join a lobby</h2><button type="button" class="icon-button" id="close-join">×</button></div><p data-t="enterCode">Enter the 6-character lobby code and your nickname.</p><label for="join-code" data-t="code">Room code</label><input id="join-code" maxlength="6" autocomplete="off" placeholder="ABC123" required spellcheck="false"><label for="join-name" data-t="nickname">Nickname</label><input id="join-name" maxlength="24" placeholder="Player" autocomplete="nickname" required><p id="join-error" class="form-error"></p><button type="submit" class="button primary full" data-t="join">Join</button></form></dialog>
+<dialog id="settings-dialog" class="dialog wide-dialog"><form id="settings-form"><div class="dialog-head"><h2 id="settings-title">Create lobby</h2><button type="button" id="close-settings" class="icon-button">×</button></div>
+<div class="settings-grid"><div class="field" id="host-name-field"><label for="host-name" data-t="nickname">Nickname</label><input id="host-name" maxlength="24" value="Player 1" autocomplete="nickname"></div>
+<div class="field"><label for="setup-select" data-t="setup">Starting position</label><select id="setup-select"><option value="classic" data-t="classic">Classic</option><option value="fischer" data-t="fischer">Fischer random</option><option value="custom" data-t="custom">Custom board</option></select></div>
+<div class="field" id="format-field"><label for="format-select" data-t="format">Game format</label><select id="format-select"><option value="ffa">Free-for-All</option><option value="teams" data-t="teams">Teams</option></select></div>
+<div class="field"><label for="minutes-select" data-t="minutes">Time per player</label><select id="minutes-select"><option value="0" data-t="unlimited">Unlimited</option><option value="1">1 min</option><option value="3">3 min</option><option value="5">5 min</option><option value="10" selected>10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></div>
+<div class="field"><label for="increment-select" data-t="increment">Time increment</label><select id="increment-select"><option value="0" data-t="noIncrement">None</option><option value="1">+1 sec</option><option value="2">+2 sec</option><option value="3">+3 sec</option><option value="5">+5 sec</option><option value="10">+10 sec</option><option value="15">+15 sec</option><option value="30">+30 sec</option></select></div>
+<label class="checkline field"><input type="checkbox" id="allow-premoves" checked><span data-t="allowPremoves">Allow premoves</span></label></div>
+<section class="settings-section"><label class="checkline"><input type="checkbox" id="separate-clocks"><span data-t="differentClocks">Different time for each player</span></label><div class="settings-grid" id="seat-clock-settings" hidden></div></section>
+<section class="settings-section" id="team-settings" hidden><h3 data-t="teams">Teams</h3><div class="preset-line"><button type="button" class="button outline team-preset" data-preset="two">2 vs 2</button><button type="button" class="button outline team-preset" data-preset="three">3 vs 1</button><button type="button" class="button outline team-preset" data-preset="split">2 + 1 + 1</button></div><div class="settings-grid" id="team-controls"></div><p class="helper" data-t="teamsHelp">Allies cannot capture each other. Last surviving team wins.</p></section>
+<section class="settings-section" id="custom-settings" hidden><div class="section-top"><h3 data-t="boardEditor">Board editor</h3><span class="side-note" data-t="oneKing">Exactly one king per color</span></div><div class="editor-tools"><label><span data-t="color">Color</span><select id="editor-color"></select></label><label><span data-t="piece">Piece</span><select id="editor-piece"></select></label><button type="button" class="button outline" id="editor-standard" data-t="restore">Restore default</button><button type="button" class="button outline" id="editor-clear" data-t="clear">Clear</button></div><div class="editor-board" id="editor-board"></div></section>
+<p class="form-error" id="settings-error"></p><button type="submit" class="button primary full" id="save-settings" data-t="createLobby">Create lobby</button></form></dialog>
+<dialog id="customize-dialog" class="dialog wide-dialog appearance-dialog">
+<div class="dialog-head"><h2 data-t="customize">Customize Board</h2><button type="button" class="icon-button" id="close-customize" aria-label="Close">×</button></div>
+<p data-t="appearanceExplain">Both options transform the board and pieces together. Your choice is visible to other players who enable their skins.</p>
+<div class="appearance-tabs" role="tablist"><button type="button" class="appearance-tab active" id="palette-tab" data-t="palettes">Color Palettes</button><button type="button" class="appearance-tab" id="skins-tab" data-t="artSkins">Art Skins</button></div>
+<div id="appearance-grid" class="appearance-grid"></div>
+<div class="appearance-preview"><div><strong data-t="livePreview">Live preview</strong><p id="preview-label"></p></div><div id="appearance-mini" class="mini-board"></div></div>
+<button type="button" class="button primary full" id="apply-appearance" data-t="applyAppearance">Apply this look</button>
+</dialog>
+<dialog id="promotion-dialog" class="dialog"><h2 data-t="promotion">Pawn promotion</h2><p data-t="choosePiece">Choose a piece:</p><div class="promotion-choices" id="promotion-choices"><button class="button outline" data-promotion="Q" data-t="queen">♛ Queen</button><button class="button outline" data-promotion="R" data-t="rook">♜ Rook</button><button class="button outline" data-promotion="B" data-t="bishop">♝ Bishop</button><button class="button outline" data-promotion="N" data-t="knight">♞ Knight</button></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body></html>

@@ -1,0 +1,14 @@
+# BaldChess test launch on Render (free instance; storage is NOT durable).
+services:
+  - type: web
+    name: baldchess
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: BaldChess
+    buildCommand: python -m compileall -q server.py engine.py
+    startCommand: python server.py --no-browser
+    healthCheckPath: /
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: '1'
