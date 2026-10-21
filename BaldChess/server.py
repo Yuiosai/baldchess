@@ -3,6 +3,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse
 import argparse
+import copy
 import json
 import os
 import re
@@ -112,6 +113,8 @@ def restore():
         room['clock_updated'] = time.time()  # pause clocks during downtime
         room['last_seen'] = {}
         room['host_controls'] = []
+        room.setdefault('undo_state', None)
+        room.setdefault('undo_actor', None)
         room.setdefault('skins', {c: 'classic' for c in COLORS})
         room.setdefault('colors', DEFAULT_COLORS.copy())
         room.setdefault('appearances', {c: 'palette:classic' for c in COLORS})
@@ -151,7 +154,8 @@ def create_room(options, name='Создатель'):
             'tokens': {token: 'red'}, 'skins': {c: 'classic' for c in COLORS},
             'colors': DEFAULT_COLORS.copy(), 'appearances': {c: 'palette:classic' for c in COLORS},
             'revision': 1, 'created': int(time.time()), 'updated': time.time(), 'clock_updated': time.time(),
-            'last_seen': {'red': time.time()}, 'host_controls': []}
+            'last_seen': {'red': time.time()}, 'host_controls': [],
+            'undo_state': None, 'undo_actor': None}
     room['seats']['red'] = clean_name(name)
     ROOMS[code] = room
     persist()
@@ -177,6 +181,8 @@ def refresh_clock(room):
     state['clock'][turn] = max(0.0, state['clock'][turn] - max(0.0, min(now - last, 86400)))
     if state['clock'][turn] <= 0:
         resign(state, turn, 'время вышло')
+        room['undo_state'] = None
+        room['undo_actor'] = None
         room['revision'] += 1
         room['updated'] = now
         persist()
@@ -203,6 +209,8 @@ def describe(code, token=None):
     return {'code': code, 'mode': 'online', 'state': public_state(room['state']),
             'seats': room['seats'], 'skins': room['skins'], 'colors': room['colors'], 'appearances': room['appearances'], 'joined': joined(room),
             'role': player or 'spectator', 'revision': room['revision'],
+            'can_undo': bool(room.get('undo_state') is not None and
+                             player and (player == 'red' or player == room.get('undo_actor'))),
             'offline': {c: offline(room, c) for c in seats(room['state']['options'])},
             'host_controls': room.get('host_controls', [])}
 
@@ -303,7 +311,7 @@ class Handler(BaseHTTPRequestHandler):
             code, token = create_room(body.get('options', {}), body.get('name', 'Создатель'))
             self.respond({'code': code, 'token': token, 'room': describe(code, token)})
             return
-        match = re.fullmatch(r'/api/rooms/([A-Z2-9]{6})/(join|legal|move|resign|reset|settings|skin|appearance|takeover)', path)
+        match = re.fullmatch(r'/api/rooms/([A-Z2-9]{6})/(join|legal|move|undo|resign|reset|settings|skin|appearance|takeover)', path)
         if not match:
             self.fail('Неизвестная команда', 404)
             return
@@ -373,12 +381,25 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(start, list) or not isinstance(end, list) or len(start) != 2 or len(end) != 2:
                 raise ValueError('Invalid coordinates')
             actor = state['turn']
+            snapshot = copy.deepcopy(state)
             move(state, start, end, body.get('promotion', 'Q'))
+            room['undo_state'] = snapshot
+            room['undo_actor'] = actor
             if state['clock'] is not None:
                 state['clock'][actor] += state['options']['increment']
             room['clock_updated'] = time.time()
+        elif action == 'undo':
+            if room.get('undo_state') is None:
+                raise ValueError('Нет хода для отмены')
+            if color not in ('red', room.get('undo_actor')):
+                raise ValueError('Отменить ход может сделавший его игрок или хост')
+            room['state'] = room.pop('undo_state')
+            room['undo_actor'] = None
+            room['clock_updated'] = time.time()
         elif action == 'resign':
             resign(state, color)
+            room['undo_state'] = None
+            room['undo_actor'] = None
             room['clock_updated'] = time.time()
         elif action == 'reset':
             if color != 'red': raise ValueError('Перезапустить партию может только создатель')
@@ -386,17 +407,25 @@ class Handler(BaseHTTPRequestHandler):
             if joined(room) < len(seats(state['options'])): state['status'] = 'waiting'
             room['state'] = state
             room['host_controls'] = []
+            room['undo_state'] = None
+            room['undo_actor'] = None
             room['clock_updated'] = time.time()
         elif action == 'settings':
-            if color != 'red' or state['status'] != 'waiting':
-                raise ValueError('Настройки меняет создатель до начала партии')
+            if color != 'red':
+                raise ValueError('Настройки меняет только хост')
             options = validate_options(body.get('options'))
-            if joined(room) > 1 and options['mode'] != state['options']['mode']:
-                raise ValueError('Нельзя менять число игроков после подключения участников')
+            # A new 1v1 game cannot silently expel occupied blue/green seats.
+            if any(room['seats'].get(c) for c in COLORS if c not in seats(options)):
+                raise ValueError('Нельзя сменить режим, пока заняты лишние места')
             state = initial_state(options)
-            state['status'] = 'waiting'
+            if joined(room) < len(seats(options)):
+                state['status'] = 'waiting'
+            else:
+                state['history'].append({'kind': 'start'})
             room['state'] = state
             room['host_controls'] = []
+            room['undo_state'] = None
+            room['undo_actor'] = None
             room['clock_updated'] = time.time()
         elif action == 'appearance':
             appearance = body.get('appearance')

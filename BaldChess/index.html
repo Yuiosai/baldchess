@@ -16,8 +16,8 @@
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="BaldChess — Play Chess Together">
 <meta name="twitter:description" content="Free online chess for two or four players.">
 <title translate="no">BaldChess — Free Online Chess for 2 or 4 Players</title>
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=5165">
-<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=5162" defer></script><script src="/js/pieces.js?v=5" defer></script><script src="/js/app.js?v=5164" defer></script>
+<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=5166">
+<script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=5166" defer></script><script src="/js/pieces.js?v=5166" defer></script><script src="/js/app.js?v=5166" defer></script>
 </head><body>
 <section class="welcome" id="welcome" aria-label="Choose game mode">
  <div class="welcome-inner">
@@ -52,14 +52,14 @@
  <label class="checkline display-toggle" title="Mute chess move sounds"><input type="checkbox" id="sound-enabled" checked><span data-t="playSounds">Move sounds</span></label>
  <p class="helper" data-t="showPlayerHelp">Turn off to display the entire board and all pieces in your chosen style. Other players are unaffected.</p>
 </section>
-<div class="bottom-actions"><button class="button outline danger" id="resign-button" disabled data-t="resign">Resign</button><button class="button outline" id="reset-button" disabled data-t="rematch">↻ Rematch</button></div>
+<div class="bottom-actions"><button class="button outline danger" id="resign-button" disabled data-t="resign">Resign</button><button class="button outline" id="undo-button" disabled data-t="undoMove" title="Undo last move">↶ Undo move</button><button class="button outline" id="reset-button" disabled data-t="rematch">↻ Rematch</button></div>
 <p class="fineprint" data-t="noAccounts">No accounts. Seats are restored using a token saved in this browser. If a player goes offline, the host can take over their pieces.</p>
 </aside></main>
 <div id="mobile-utilities" class="mobile-utilities" aria-label="Additional game settings"></div>
 <footer class="footer"><span class="notranslate" translate="no">BALDCHESS</span> <span>·</span> <span data-t="footer">ONLINE · CHESS</span></footer></div>
 <dialog id="join-dialog" class="dialog"><form id="join-form"><div class="dialog-head"><h2 data-t="joinRoom">Join a lobby</h2><button type="button" class="icon-button" id="close-join">×</button></div><p data-t="enterCode">Enter the 6-character lobby code and your nickname.</p><label for="join-code" data-t="code">Room code</label><input id="join-code" maxlength="6" autocomplete="off" placeholder="ABC123" required spellcheck="false"><label for="join-name" data-t="nickname">Nickname</label><input id="join-name" maxlength="24" placeholder="Player" autocomplete="nickname" required><p id="join-error" class="form-error"></p><button type="submit" class="button primary full" data-t="join">Join</button></form></dialog>
 <dialog id="settings-dialog" class="dialog wide-dialog"><form id="settings-form"><div class="dialog-head"><h2 id="settings-title">Create lobby</h2><button type="button" id="close-settings" class="icon-button">×</button></div>
-<div class="settings-grid"><div class="field" id="host-name-field"><label for="host-name" data-t="nickname">Nickname</label><input id="host-name" maxlength="24" value="Player 1" autocomplete="nickname"></div>
+<div class="settings-grid"><div class="field" id="game-mode-field" hidden><label for="game-mode-select" data-t="gameModeSetting">Game mode</label><select id="game-mode-select"><option value="duel" data-t="duel">1 VS 1</option><option value="four" data-t="four">4 PLAYERS</option></select></div><div class="field" id="host-name-field"><label for="host-name" data-t="nickname">Nickname</label><input id="host-name" maxlength="24" value="Player 1" autocomplete="nickname"></div>
 <div class="field"><label for="setup-select" data-t="setup">Starting position</label><select id="setup-select"><option value="classic" data-t="classic">Classic</option><option value="fischer" data-t="fischer">Fischer random</option><option value="custom" data-t="custom">Custom board</option></select></div>
 <div class="field" id="format-field"><label for="format-select" data-t="format">Game format</label><select id="format-select"><option value="ffa">Free-for-All</option><option value="teams" data-t="teams">Teams</option></select></div>
 <div class="field"><label for="minutes-select" data-t="minutes">Time per player</label><select id="minutes-select"><option value="0" data-t="unlimited">Unlimited</option><option value="1">1 min</option><option value="3">3 min</option><option value="5">5 min</option><option value="10" selected>10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></div>
