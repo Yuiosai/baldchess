@@ -396,3 +396,9 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 /* The previous compact-lobby rule hides everything except the invite link.
    Keep the host's next-game settings available throughout the match. */
 #invite-panel.compact-lobby > #edit-settings:not([hidden]){display:block!important;margin-top:8px;width:100%}
+
+/* 5.16.7: gentle discoverability links; leave game layout unchanged. */
+.discover-links{margin:13px auto 0;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;line-height:1.5}
+.discover-links a{color:#bcd6e9;text-decoration:underline;text-underline-offset:3px}
+.discover-links a:hover,.discover-links a:focus-visible{color:#e2fff4}
+@media(max-width:640px){.welcome .discover-links{gap:6px;margin-top:6px;font-size:11px}.welcome .welcome-lang{margin-top:10px}}

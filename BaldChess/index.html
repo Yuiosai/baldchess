@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- BaldChess is a proper brand name. Our built-in RU/EN selector handles localization; avoid automatic machine translation. -->
 <meta name="google" content="notranslate">
-<meta name="theme-color" content="#88a8c8">
+<meta name="theme-color" content="#131e2b">
 <meta name="description" content="BaldChess — free online chess for 2 or 4 players. Play with friends in private rooms, choose chess sets, set clocks and customize your board.">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://baldchess.com/">
@@ -12,12 +12,18 @@
 <meta property="og:title" content="BaldChess — Online Chess for 2 or 4 Players">
 <meta property="og:description" content="Free multiplayer chess. Create a private room, invite your friends and play 1v1 or four-player chess.">
 <meta property="og:url" content="https://baldchess.com/">
-<meta property="og:image" content="https://baldchess.com/assets/logo.png">
-<meta name="twitter:card" content="summary"><meta name="twitter:title" content="BaldChess — Play Chess Together">
+<meta property="og:image" content="https://baldchess.com/assets/social-preview.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="BaldChess chess bishop logo and 2 or 4 players">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="BaldChess — Play Chess Together">
 <meta name="twitter:description" content="Free online chess for two or four players.">
 <title translate="no">BaldChess — Free Online Chess for 2 or 4 Players</title>
-<link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="/style.css?v=5166">
+<link rel="icon" href="/assets/favicon.png" type="image/png" sizes="128x128">
+<link rel="icon" href="/assets/favicon.ico" type="image/x-icon" sizes="any">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/style.css?v=5167">
 <script src="/js/board.js?v=5" defer></script><script src="/js/themes.js?v=5" defer></script><script src="/js/game.js?v=5166" defer></script><script src="/js/pieces.js?v=5166" defer></script><script src="/js/app.js?v=5166" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"BaldChess","url":"https://baldchess.com/","inLanguage":["en","ru"]},{"@type":"WebApplication","name":"BaldChess","url":"https://baldchess.com/","applicationCategory":"GameApplication","operatingSystem":"Any","description":"Play free online chess with two or four players in private multiplayer rooms, with configurable time controls and board themes.","image":"https://baldchess.com/assets/social-preview.png","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}]}</script>
 </head><body>
 <section class="welcome" id="welcome" aria-label="Choose game mode">
  <div class="welcome-inner">
@@ -28,6 +34,7 @@
    <button class="mode-card" id="choose-four"><span class="mode-visual mode-four">♜ ♞<br>♝ ♛</span><strong data-t="four">4 PLAYERS</strong><small data-t="fourDesc">Cross-shaped 14 × 14 board</small></button>
   </div>
   <button id="welcome-join" class="button outline" data-t="joinCode">Join with room code</button><button id="back-to-game" class="button outline" data-t="backToGame" hidden>Back to current game</button>
+  <nav class="discover-links" aria-label="Game instructions"><a href="/four-player-chess" lang="en">How to play 4-player chess</a><span aria-hidden="true"> · </span><a href="/ru/shahmaty-na-chetveryh" lang="ru">Правила шахмат на четверых</a></nav>
   <div class="welcome-lang"><label for="language-select" data-t="language">Language</label><select id="language-select"><option value="en">English</option><option value="ru">Русский</option></select></div>
  </div>
 </section>

@@ -1,0 +1,21 @@
+{
+  "name": "BaldChess",
+  "short_name": "BaldChess",
+  "description": "Free online chess for 2 or 4 players.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#131e2b",
+  "theme_color": "#131e2b",
+  "icons": [
+    {
+      "src": "/assets/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ]
+}
