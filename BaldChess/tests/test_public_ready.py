@@ -67,9 +67,11 @@ class PublicReadyTests(unittest.TestCase):
         self.assertEqual(err.exception.code,400)  # cannot evict already-joined seats
         self.req(f'/api/rooms/{code}/join',{'name':'C'})
         self.req(f'/api/rooms/{code}/join',{'name':'D'})
-        with self.assertRaises(HTTPError) as err:
-            self.req(f'/api/rooms/{code}/settings', update,token=host)
-        self.assertEqual(err.exception.code,400)  # cannot change a started game
+        restarted = self.req(f'/api/rooms/{code}/settings', update,token=host)
+        self.assertEqual(restarted['room']['state']['status'], 'playing')
+        self.assertEqual(restarted['room']['state']['move_count'], 0)
+        self.assertEqual(restarted['room']['code'], code)
+        self.assertEqual(restarted['room']['joined'], 4)
 
     def test_db_restore_after_restart(self):
         created=self.req('/api/rooms',{'options':{'mode':'duel'},'name':'One'})
