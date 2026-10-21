@@ -11,6 +11,8 @@
  Object.assign(LANG.ru,{welcomeMotto:'ТВОЯ ДОСКА. ТВОИ ПРАВИЛА.',online:'В СЕТИ',backToGame:'Вернуться к текущей партии',copyCode:'Скопировать код комнаты',team:'Команда',joinHint:'Используй этот код для входа.',invalidSkin:'Неверный скин',player:'Игрок',second:'сек',teamsHeader:'КОМАНДЫ · 4 ИГРОКА',freeForAllHeader:'FREE FOR ALL · 4 ИГРОКА',footer:'СЕТЕВЫЕ ШАХМАТЫ',sendInvite:'Ссылка-приглашение скопирована',seatTop:'Верх',seatBottom:'Низ',seatLeft:'Слева',seatRight:'Справа'});
  Object.assign(LANG.en,{playSounds:'Move sounds'});
  Object.assign(LANG.ru,{playSounds:'Звуки ходов'});
+ Object.assign(LANG.en,{undoMove:'↶ Undo move',newGameSettings:'New game settings',startConfigured:'Start a new game',gameModeSetting:'Game mode',confirmConfigured:'Start a new game with these settings? This will replace the current game.'});
+ Object.assign(LANG.ru,{undoMove:'↶ Отменить ход',newGameSettings:'Настройки новой партии',startConfigured:'Начать новую партию',gameModeSetting:'Режим игры',confirmConfigured:'Начать новую партию с этими настройками? Текущая партия будет заменена.'});
  Object.assign(LANG.en,{customize:'Customize Board',displayOptions:'Display',showPlayerSkins:'Show other players’ skins',showPlayerHelp:'Switch off to see the entire board and every piece in your own style. Other players will not be affected.',palettes:'Color Palettes',artSkins:'Art Skins',appearanceExplain:'Both choices change board colors and the pieces together. With player skins enabled, friends see your territory and your figures in this style.',livePreview:'Preview',applyAppearance:'Apply appearance'});
  Object.assign(LANG.ru,{customize:'Кастомизация доски',displayOptions:'Отображение',showPlayerSkins:'Показывать скины других игроков',showPlayerHelp:'Выключи, чтобы вся доска и все фигуры отображались в твоём оформлении. У других игроков ничего не изменится.',palettes:'Цветовые палитры',artSkins:'Художественные скины',appearanceExplain:'И палитры, и скины меняют вместе доску, цвета и фигуры. При включённом отображении другие игроки увидят твою область доски и твои фигуры.',livePreview:'Предпросмотр',applyAppearance:'Применить оформление'});
  let language='en',chosenMode='four',showWelcome=true,editing=false,showPlayerThemes=true,chosenAppearance='palette:classic',cells=[],editorCells=[],boardSize=0,editorSize=0,toastTimer,editor={board:ChessBoard.startBoard()};
@@ -297,6 +299,10 @@
   'The player is still connected':['This player is still online.','Игрок всё ещё в сети.'],
   'Перезапустить партию может только создатель':['Only the host can restart a game.','Только хост может перезапустить партию.'],
   'Настройки меняет создатель до начала партии':['Only the host can change settings before the game.','Настройки меняет хост до начала партии.'],
+  'Настройки меняет только хост':['Only the host can configure the game.','Настройки меняет только хост.'],
+  'Нет хода для отмены':['No move to undo.','Нет хода для отмены.'],
+  'Отменить ход может сделавший его игрок или хост':['Only the last mover or host can undo.','Отменить ход может сделавший его игрок или хост.'],
+  'Нельзя сменить режим, пока заняты лишние места':['Cannot switch to 1v1 while blue/green seats are occupied.','Нельзя перейти на 1 на 1, пока заняты места синих или зелёных.'],
   'Неизвестный скин фигур':['Unknown piece skin.','Неизвестный скин фигур.'],
   'Неверный цвет фигур':['Invalid piece color.','Неверный цвет фигур.']
  };
@@ -317,6 +323,7 @@
   $('game-page').classList.toggle('duel-mode',duelMobileClocks);
   $('resign-button').disabled=!has||room.state.status!=='playing'||room.role==='spectator'||!room.state.active[room.role];
   $('reset-button').disabled=!has||room.role!=='red';
+  $('undo-button').disabled=!has||!room.can_undo;
   if(!has)return;
   chosenMode=room.state.options.mode;
   const s=room.state,opts=s.options,waiting=s.status==='waiting',done=s.status==='finished',list=players(opts.mode),myTurn=ChessGame.controlled(s.turn);
@@ -334,7 +341,8 @@
   $('move-counter').textContent=t('moves')+': '+s.move_count;
   $('player-count').textContent=room.joined+' / '+list.length;
   $('room-code').textContent=room.code;
-  setHidden('edit-settings',!(room.role==='red'&&waiting));
+  setHidden('edit-settings',room.role!=='red');
+  $('edit-settings').textContent=waiting?t('editLobby'):t('newGameSettings');
   $('customize-button').disabled=room.role==='spectator';
   $('room-options-summary').textContent=[t({classic:'classicSetup',fischer:'fischerSetup',custom:'customSetup'}[opts.variant]),opts.mode==='duel'?t('oneVsOne'):opts.format==='teams'?t('teamsMode'):t('ffa'),opts.seat_minutes?t('individual'):opts.minutes?opts.minutes+' '+t('minute'):t('noClock'),opts.premoves?t('premovesOn'):t('premovesOff')].join(' · ');
   $('invite-hint').textContent=waiting?t('inviteOthers'):t('stay');
@@ -377,6 +385,7 @@
   renderEditor();
  }
  function fillOptions(opts){
+  $('game-mode-select').value=opts.mode||chosenMode;
   $('setup-select').value=opts.variant;$('format-select').value=opts.format;$('minutes-select').value=opts.minutes;$('increment-select').value=opts.increment;
   $('allow-premoves').checked=opts.premoves;$('separate-clocks').checked=Boolean(opts.seat_minutes);setHidden('seat-clock-settings',!opts.seat_minutes);
   for(const c of ChessBoard.COLORS){$('team-'+c).value=opts.teams[c];$('seat-time-'+c).value=opts.seat_minutes?.[c]||opts.minutes||10;}
@@ -391,7 +400,10 @@
  }
  function openSettings(edit=false){
   editing=edit;const room=ChessGame.get().room;if(edit&&room)chosenMode=room.state.options.mode;
-  $('settings-title').textContent=edit?t('settings'):t('createLobby');$('save-settings').textContent=edit?t('save'):t('createLobby');
+  const nextGame=edit&&room?.state.status!=='waiting';
+  $('settings-title').textContent=nextGame?t('newGameSettings'):edit?t('settings'):t('createLobby');
+  $('save-settings').textContent=nextGame?t('startConfigured'):edit?t('save'):t('createLobby');
+  setHidden('game-mode-field',!edit);
   setHidden('host-name-field',edit);$('settings-error').textContent='';
   if(!edit)$('host-name').value=rememberedNickname()||'Player 1';
   if(edit&&room)fillOptions(room.state.options);else fillOptions({variant:'classic',format:'ffa',minutes:10,increment:0,premoves:true,teams:{red:0,blue:1,yellow:2,green:3},seat_minutes:null});
@@ -403,6 +415,11 @@
  $('back-to-game').addEventListener('click',()=>{showWelcome=false;const g=ChessGame.get();render(g.room,g.selected,g.moves,g.premove);});
  $('edit-settings').addEventListener('click',()=>openSettings(true));
  $('close-settings').addEventListener('click',()=>$('settings-dialog').close());
+ $('game-mode-select').addEventListener('change',e=>{
+  chosenMode=e.target.value;
+  if(editor.board.length!==(chosenMode==='duel'?8:14))editor.board=ChessBoard.startBoard(chosenMode);
+  setModeUI();
+ });
  $('setup-select').addEventListener('change',setModeUI);
  $('format-select').addEventListener('change',setModeUI);
  $('separate-clocks').addEventListener('change',()=>{setHidden('seat-clock-settings',!$('separate-clocks').checked);});
@@ -413,6 +430,7 @@
   e.preventDefault();const opts=getOptions();$('settings-error').textContent='';
   if(opts.format==='teams'&&new Set(Object.values(opts.teams)).size<2){$('settings-error').textContent=t('needTeams');return;}
   if(opts.variant==='custom')for(const c of players(chosenMode)){const count=editor.board.flat().filter(p=>p?.color===c&&p.type==='K').length;if(count!==1){$('settings-error').textContent=t('needKings')+' '+colorLabel(c);return;}}
+  if(editing&&ChessGame.get().room?.state.status!=='waiting'&&!confirm(t('confirmConfigured')))return;
   $('save-settings').disabled=true;
   try{if(editing)await ChessGame.action('settings',{options:opts});else{
     await ChessGame.create(opts,$('host-name').value.trim()||'Player 1');
@@ -440,6 +458,7 @@
  $('copy-link').addEventListener('click',()=>copy(location.origin+location.pathname+'?room='+ChessGame.get().room.code));
  $('resign-button').addEventListener('click',()=>{if(confirm(t('confirmResign')))ChessGame.action('resign').catch(err=>toast(serverError(err.message)));});
  $('reset-button').addEventListener('click',()=>{if(confirm(t('confirmRematch')))ChessGame.action('reset').catch(err=>toast(serverError(err.message)));});
+ $('undo-button').addEventListener('click',()=>ChessGame.action('undo').catch(err=>toast(serverError(err.message))));
 
  // One local switch: show the board portions and custom pieces chosen by other players.
  $('sound-enabled')?.addEventListener('change',e=>ChessAudio.setEnabled(e.target.checked));

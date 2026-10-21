@@ -20,7 +20,11 @@ const ChessGame=(()=>{
  function setUrl(code){let url=new URL(location.href);if(code)url.searchParams.set('room',code);else url.searchParams.delete('room');history.replaceState(null,'',url);}
  function accept(next){
   if(!room||room.code!==next.code){selectionEpoch++;selected=null;moves=[];premove=null;}
-  else if(next.revision!==room.revision){selectionEpoch++;selected=null;moves=[];}
+  else if(next.revision!==room.revision){
+   selectionEpoch++;selected=null;moves=[];
+   if(next.state.move_count < room.state.move_count ||
+      JSON.stringify(next.state.options)!==JSON.stringify(room.state.options))premove=null;
+  }
   if(!room||room.code!==next.code||next.revision>=room.revision){
    const changed=!room||next.code!==room.code||next.revision!==room.revision||JSON.stringify(next.offline)!==JSON.stringify(room.offline);
    next.seenAt=Date.now();room=next;remember();if(changed)notify();
@@ -85,7 +89,7 @@ const ChessGame=(()=>{
    premove={from,to,promotion};notify();
   }
  }
- async function action(name,extra={}){if(!room)return;pending=true;try{let res=await request('/api/rooms/'+room.code+'/'+name,'POST',extra);if(['reset','settings'].includes(name))premove=null;accept(res.room);}finally{pending=false;}}
+ async function action(name,extra={}){if(!room)return;pending=true;try{let res=await request('/api/rooms/'+room.code+'/'+name,'POST',extra);if(['reset','settings','undo'].includes(name))premove=null;accept(res.room);}finally{pending=false;}}
  function cancelInteraction(){selectionEpoch++;selected=null;moves=[];premove=null;notify();}
  function cancelPremove(){cancelInteraction();}
  return {onChange,create,join,openRoom,bootstrap,poll,choose,drag,action,get:()=>({room,token,selected,moves,premove,pending}),readStore,cancelPremove,cancelInteraction,controlled,currentActor};

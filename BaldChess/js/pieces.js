@@ -66,7 +66,7 @@ const ChessPieces=(()=>{
   P:'00000000/00111100/01111110/01111110/00111100/00111100/01111110/11111111'
  };
  function get(kind,skin){
-  if(skin==='classic'){const span=document.createElement('span');span.className='glyph';span.textContent=ChessBoard.SYMBOLS[kind];return span;}
+  // The classic set is real inline SVG too: no OS-dependent Unicode chess fonts.
   let shapes={dragons,fortress,cosmos,mystic,celestial,abyss};let inner=shapes[skin]?.[kind]||base[kind];
   if(skin==='pixel')inner=pixel[kind].split('/').map((row,y)=>[...row].map((x,j)=>x==='1'?`<rect x="${j*7+4}" y="${y*7+4}" width="7" height="7"/>`:'' ).join('')).join('');
   const wrap=document.createElement('span');wrap.className='art';wrap.innerHTML=`<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="pieceMetal" x1="0" y1="0" x2="0.65" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".78"/><stop offset=".22" stop-color="currentColor"/><stop offset=".55" stop-color="currentColor"/><stop offset="1" stop-color="#101523" stop-opacity=".93"/></linearGradient></defs><g fill="currentColor">${inner}</g><path d="M15 54h34" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.8" stroke-linecap="round"/></svg>`;
