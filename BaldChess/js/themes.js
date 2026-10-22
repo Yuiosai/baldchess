@@ -2,7 +2,7 @@
 // Palettes keep classic silhouettes; art skins use their own vector artwork.
 const ChessThemes=(()=>{
  const themes={
-  'palette:classic':{en:'Classic',ru:'Классика',light:'#ebd9bb',dark:'#966f50',edge:'#5c483e',piece:{red:'#f2e4c8',yellow:'#6c4f3b',blue:'#456b86',green:'#6a7f48'},uniformPiece:{red:'#f4d2ae',yellow:'#73553f',blue:'#2d628b',green:'#5e7c36'},skin:'classic'},
+  'palette:classic':{en:'Classic',ru:'Классика',light:'#ebd9bb',dark:'#966f50',edge:'#5c483e',piece:{red:'#e25e58',yellow:'#e8ca62',blue:'#215c99',green:'#73b680'},uniformPiece:{red:'#e25e58',yellow:'#e8ca62',blue:'#246cac',green:'#6ab678'},skin:'classic'},
   'palette:forest':{en:'Forest',ru:'Лес',light:'#e6e7ca',dark:'#719078',edge:'#344e48',piece:{red:'#d8c08f',yellow:'#4e6959',blue:'#567884',green:'#a4bc73'},uniformPiece:{red:'#e0bc82',yellow:'#476454',blue:'#386e86',green:'#9cbc54'},skin:'classic'},
   'palette:marble':{en:'Marble',ru:'Мрамор',light:'#e9edf0',dark:'#98a8af',edge:'#687981',piece:{red:'#c79d86',yellow:'#65727b',blue:'#305f80',green:'#7b6b55'},uniformPiece:{red:'#d09b7f',yellow:'#626e78',blue:'#356b89',green:'#6c5c46'},skin:'classic'},
   'palette:midnight':{en:'Midnight',ru:'Полночь',light:'#5a6479',dark:'#2b344a',edge:'#131b2c',piece:{red:'#e3c9a8',yellow:'#d9e3ef',blue:'#7aa8d6',green:'#9ec9b0'},uniformPiece:{red:'#e8c08d',yellow:'#f1f5fb',blue:'#77afe8',green:'#93d5af'},skin:'classic'},

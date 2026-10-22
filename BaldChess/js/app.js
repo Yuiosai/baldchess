@@ -134,12 +134,12 @@
    {duration:125,easing:'cubic-bezier(.18,.75,.25,1)'});
  }
  function pieceSpan(p,skin,color,dead=false){
-  const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin));return el;
+  const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin,p.color,color));return el;
  }
  function myAppearance(room){return room?.appearances?.[room.role]||load('baldchess_appearance','palette:classic');}
  function shownAppearance(room,color){return !showPlayerThemes?myAppearance(room):(room?.appearances?.[color]||'palette:classic');}
  function pieceAppearance(room,color){return shownAppearance(room,color);}
- function colorFor(p,room,appearance){const theme=ChessThemes.get(appearance||shownAppearance(room,p.color));const mode=room?.state?.options?.mode||chosenMode;const localUniform=room && !showPlayerThemes && mode==='four';const palette=localUniform&&(theme.uniformPiece||theme.piece)?(theme.uniformPiece||theme.piece):theme.piece;return palette[p.color];}
+ function colorFor(p,room,appearance){const id=appearance||shownAppearance(room,p.color);const theme=ChessThemes.get(id);const mode=room?.state?.options?.mode||chosenMode;const localUniform=room && !showPlayerThemes && mode==='four';const palette=localUniform&&(theme.uniformPiece||theme.piece)?(theme.uniformPiece||theme.piece):theme.piece;if(mode==='duel'&&id==='palette:classic')return {red:'#ffffff',yellow:'#101010'}[p.color]||palette[p.color];return palette[p.color];}
  let currentBoardOrientation='';
  function orientedCell(r,c,size,orientation){
   if(orientation==='yellow')return [size-1-r,size-1-c];
@@ -476,7 +476,7 @@
    const cell=document.createElement('div');cell.className='mini-square '+((r+c)%2?'dark':'light');
    cell.style.backgroundColor=(r+c)%2?style.dark:style.light;
    if(r===0||r===3){const color=r===0?'yellow':'red';const kind=r===0?kinds[c]:c%2?'P':kinds[c];
-    cell.append(pieceSpan({type:kind,color},style.skin,style.piece[color]));}
+    cell.append(pieceSpan({type:kind,color},style.skin,(chosenMode==='duel'&&chosenAppearance==='palette:classic')?{red:'#ffffff',yellow:'#101010'}[color]:style.piece[color]));}
    mini.append(cell);
   }
  }
