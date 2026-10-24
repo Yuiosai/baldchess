@@ -402,3 +402,7 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 .discover-links a{color:#bcd6e9;text-decoration:underline;text-underline-offset:3px}
 .discover-links a:hover,.discover-links a:focus-visible{color:#e2fff4}
 @media(max-width:640px){.welcome .discover-links{gap:6px;margin-top:6px;font-size:11px}.welcome .welcome-lang{margin-top:10px}}
+
+/* Compact, visible Russian discovery text on the real playable homepage. */
+.welcome .welcome-search{max-width:690px;margin:-5px auto 18px;color:#adc3d6;font-size:12px;line-height:1.5}
+@media(max-width:640px){.welcome .welcome-search{font-size:11px;max-width:330px;margin:-3px auto 12px}}

@@ -250,12 +250,19 @@ class Handler(BaseHTTPRequestHandler):
         return result
 
     def serve_file(self, path):
+        # Old SEO guide URLs are not separate sites. Send visitors and crawlers
+        # directly to the playable homepage, preserving our single canonical URL.
+        if path in ('/four-player-chess', '/ru/shahmaty-na-chetveryh'):
+            self.send_response(301)
+            self.send_header('Location', '/')
+            self.send_header('Content-Length', '0')
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            return
         files = {'/': ('index.html', 'text/html; charset=utf-8'),
                  '/index.html': ('index.html', 'text/html; charset=utf-8'),
                  '/robots.txt': ('robots.txt', 'text/plain; charset=utf-8'),
                  '/sitemap.xml': ('sitemap.xml', 'application/xml; charset=utf-8'),
-                 '/four-player-chess': ('four-player-chess.html', 'text/html; charset=utf-8'),
-                 '/ru/shahmaty-na-chetveryh': ('chess-four-ru.html', 'text/html; charset=utf-8'),
                  '/site.webmanifest': ('site.webmanifest', 'application/manifest+json'),
                  '/style.css': ('style.css', 'text/css; charset=utf-8'),
                  '/js/board.js': ('js/board.js', 'text/javascript; charset=utf-8'),
