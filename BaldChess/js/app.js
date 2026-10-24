@@ -135,8 +135,18 @@ Object.assign(LANG.en,{playSounds:'Move sounds'});
   piece.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'translate(0px,0px)'}],
    {duration:125,easing:'cubic-bezier(.18,.75,.25,1)'});
  }
+ function isDarkPieceColor(color){
+  if(typeof color!=='string')return false;
+  const m=color.trim().match(/^#([0-9a-f]{6})$/i);
+  if(!m)return false;
+  const hex=m[1];
+  const rgb=[0,2,4].map(i=>parseInt(hex.slice(i,i+2),16)/255);
+  const luminance=rgb.reduce((a,c,i)=>a+[.2126,.7152,.0722][i]*(c<=.04045?c/12.92:((c+.055)/1.055)**2.4),0);
+  return luminance<.28;
+ }
  function pieceSpan(p,skin,color,dead=false){
-  const el=document.createElement('span');el.className='piece'+(dead?' dead':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin,p.color,color));return el;
+  const classicDark=skin==='classic'&&isDarkPieceColor(color||'#fff');
+  const el=document.createElement('span');el.className='piece'+(dead?' dead':'')+(classicDark?' piece-flat-dark':'');el.style.color=color||'#fff';el.appendChild(ChessPieces.get(p.type,skin,p.color,color));return el;
  }
  function myAppearance(room){return room?.appearances?.[room.role]||load('baldchess_appearance','palette:classic');}
  function shownAppearance(room,color){return !showPlayerThemes?myAppearance(room):(room?.appearances?.[color]||'palette:classic');}

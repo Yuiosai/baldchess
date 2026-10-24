@@ -92,9 +92,11 @@ const ChessPieces=(()=>{
  function get(kind,skin,owner='red',paint=null){
   if(skin==='classic'||!skin){
    const defaultPaint={red:'#ffffff',yellow:'#101010',blue:'#215c99',green:'#73b680'};
+   const swatch=paint||defaultPaint[owner]||'#ffffff';
    const wrap=document.createElement('span');
-   wrap.className='art art-classic';
-   wrap.innerHTML=classicSVG(kind,paint||defaultPaint[owner]||'#ffffff');
+   const isDark=/^#[0-9a-f]{6}$/i.test(swatch)?(([1,3,5].map(i=>parseInt(swatch.slice(i,i+2),16)/255).reduce((a,c,i)=>a+[.2126,.7152,.0722][i]*(c<=.04045?c/12.92:((c+.055)/1.055)**2.4),0))<.28):false;
+   wrap.className='art art-classic'+(isDark?' art-dark':' art-light');
+   wrap.innerHTML=classicSVG(kind,swatch);
    return wrap;
   }
   // Other fantasy/skin artworks remain unchanged.
