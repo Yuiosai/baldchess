@@ -39,6 +39,10 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled,select:di
 .piece .art svg{display:block;width:100%;height:100%;overflow:visible}
 .piece .glyph{font-family:Georgia,'DejaVu Sans',serif;font-size:1em;line-height:1;filter:drop-shadow(0 1px 1px #101820d9) drop-shadow(0 2px 3px #0b13208a);text-shadow:0 1px 1px #0d1520e0,0 0 2px #ffffff26,-1px 0 #0d152066,1px 0 #0d152066}
 .piece.dead{color:#818998!important;opacity:.36;filter:grayscale(1)}
+
+.piece.piece-flat-dark{filter:none!important;text-shadow:none!important}
+.piece.piece-flat-dark .art,.piece.piece-flat-dark .glyph{filter:none!important;text-shadow:none!important}
+.board .square .piece.piece-flat-dark .art,.editor-board .piece.piece-flat-dark .art,.mini-square .piece.piece-flat-dark .art,.appearance-swatches .piece.piece-flat-dark .art,.drag-ghost .piece.piece-flat-dark .art{filter:none!important}
 .board .square{touch-action:none;cursor:grab}.board .square:active{cursor:grabbing}
 .drag-ghost{position:fixed;pointer-events:none;z-index:1000;transform:translate(-50%,-50%);width:70px;height:70px;filter:drop-shadow(0 11px 12px #07131b99)}
 .drag-ghost .piece{width:100%;height:100%;font-size:58px}
