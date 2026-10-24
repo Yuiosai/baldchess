@@ -1,24 +1,36 @@
-// Classic SVG contract: twelve clean font-outline designs with fixed reference colors.
+// Updated classic pieces contract for 5.16.10: native SVG and palette-aware colors.
 const vm=require('vm'),fs=require('fs'),path=require('path'),assert=require('assert');
-const code=fs.readFileSync(path.join(__dirname,'../js/pieces.js'),'utf8');
-const context={document:{createElement(){return {className:'',innerHTML:''};}}};
-vm.createContext(context);
-vm.runInContext(code+'\nthis.Pieces=ChessPieces;',context);
+const root=path.join(__dirname,'..');
+const source=fs.readFileSync(path.join(root,'js/pieces.js'),'utf8');
+const app=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const ctx={document:{createElement(){return {className:'',innerHTML:''};}}};
+vm.createContext(ctx);vm.runInContext(source+'\nthis.Pieces=ChessPieces;',ctx);
+const faces=[['red','#ffffff'],['yellow','#101010'],['blue','#215c99'],['green','#73b680']];
 for(const kind of 'KQBNRP'){
-  const white=context.Pieces.get(kind,'classic','red');
-  const black=context.Pieces.get(kind,'classic','yellow');
-  const blue=context.Pieces.get(kind,'classic','blue');
-  const green=context.Pieces.get(kind,'classic','green');
-  assert(white.className.includes('art-classic'));
-  assert(white.innerHTML.includes('viewBox="0 0 128 128"'));
-  assert(white.innerHTML.includes('fill="#ffffff"'));
-  assert(white.innerHTML.includes('fill="#111111"'));
-  assert(black.innerHTML.includes('fill="#111111"'));
-  assert(blue.innerHTML.includes('fill="#286cb0"'));
-  assert(green.innerHTML.includes('fill="#90cda4"'));
-  assert.notEqual(white.innerHTML,black.innerHTML);
-  assert(context.Pieces.get(kind,'dragons','red').innerHTML.includes('<svg'));
+ const results=new Map();
+ for(const [owner,color] of faces){
+  const {className,innerHTML}=ctx.Pieces.get(kind,'classic',owner,color);
+  assert(className.includes('art-classic'));
+  assert(innerHTML.includes('<svg viewBox="0 0 128 128"'));
+  assert(innerHTML.includes(`fill="${color}"`),`${kind}/${owner} did not use its theme fill ${color}`);
+  assert(innerHTML.includes('stroke="#111111"'));
+  assert(!innerHTML.includes('data:image/png')&&!innerHTML.includes('<image'));
+  assert(!innerHTML.includes('@F@')&&!innerHTML.includes('@D@'));
+  results.set(owner,innerHTML);
+ }
+ assert.notEqual(results.get('red'),results.get('yellow'),'White/black chessmen have same SVG');
+ assert.notEqual(results.get('blue'),results.get('green'),'Blue/green chessmen have same SVG');
+ // The selected palette also controls colors that are not one of the four defaults.
+ assert(ctx.Pieces.get(kind,'classic','red','#e25e58').innerHTML.includes('fill="#e25e58"'));
+ // The other nonclassic artworks must still work unchanged.
+ assert(ctx.Pieces.get(kind,'dragons','red').innerHTML.includes('<svg'));
+ for(const [prefix,owner,paint] of [['w','red','#ffffff'],['b','yellow','#101010']]){
+  const file=fs.readFileSync(path.join(root,'assets/classic-figures',prefix+kind+'.svg'),'utf8');
+  assert.equal(file,ctx.Pieces.get(kind,'classic',owner,paint).innerHTML);
+ }
 }
-const pawnBlack=context.Pieces.get('P','classic','yellow');
-assert(!pawnBlack.innerHTML.includes('fill="#ffffff"'), 'Black pawn is fully filled, like source');
-console.log('5.16.9 12 true-outline chess glyphs and 4-player color variants PASS');
+assert(app.includes('ChessPieces.get(p.type,skin,p.color,color)'));
+assert(html.includes('js/pieces.js?v=51611'));
+assert(html.includes('js/app.js?v=51611'));
+console.log('5.16.10: 12 SVG icons, 4 seats, theme-driven color + cache bust PASS');

@@ -29,5 +29,5 @@ class FrontendContractTests(unittest.TestCase):
 
     def test_updated_client_version(self):
         html = (ROOT / 'index.html').read_text(encoding='utf-8')
-        self.assertIn('/js/app.js?v=5166', html)
-        self.assertIn('/js/game.js?v=5166', html)
+        self.assertIn('/js/app.js?v=51611', html)
+        self.assertIn('/js/game.js?v=51611', html)
