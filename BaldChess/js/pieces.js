@@ -1,76 +1,28 @@
-// BaldChess 5.16.10 — six hand-drawn, resolution-independent classic SVG shapes.
-// No font glyphs, cropped screenshots, image masks or white-painted silhouettes.
+// BaldChess 5.16.15: Wikimedia Cburnett classic SVG chess pieces (transparent, real vectors).
+// BaldChess 5.16.14 — twelve approved classic figures faithfully traced into SVG paths.
+// Rendering uses real scalable SVG paths, not font glyphs, embedded PNGs or transparent silhouettes.
 const ChessPieces=(()=>{
- const classicShapes={
-  K:`<g fill="@F@" stroke="@S@" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M60 28V18H54V12H60V5H68V12H74V18H68V28"/>
-    <path d="M64 78 C45 77 31 79 31 79 C19 67 12 57 13 47 C14 32 25 28 36 31 C47 33 55 42 64 57 C73 42 81 33 92 31 C104 27 115 34 115 47 C116 58 106 69 97 79 C87 78 78 77 64 78Z"/>
-    <path d="M64 57 C60 46 56 37 56 32 C56 24 59 21 64 21 C69 21 72 24 72 32 C72 38 68 49 64 57Z"/>
-    <path d="M32 79 Q64 71 96 79 L99 103 Q64 113 29 103Z"/>
-    <path d="M29 105 Q64 94 99 105 L99 112 Q64 123 29 112Z"/>
-   </g>
-   <g fill="none" stroke="@D@" stroke-width="2.9" stroke-linecap="round">
-    <path d="M19 46 Q21 32 34 37 Q46 42 64 68 Q82 42 94 37 Q107 32 109 46"/>
-    <path d="M32 88 Q64 79 96 88 M31 98 Q64 89 97 98 M31 110 Q64 101 97 110"/>
-   </g>`,
-  Q:`<g fill="@F@" stroke="@S@" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M17 35 L36 73 L32 23 L52 71 L64 15 L76 71 L96 23 L92 73 L111 35 L96 83 Q64 76 32 83Z"/>
-    <circle cx="15" cy="33" r="6.2"/><circle cx="34" cy="20" r="6.2"/>
-    <circle cx="64" cy="12" r="6.3"/><circle cx="94" cy="20" r="6.2"/><circle cx="113" cy="33" r="6.2"/>
-    <path d="M32 82 Q64 74 96 82 L95 96 Q64 104 33 96Z"/>
-    <path d="M34 98 Q64 91 94 98 L98 112 Q64 121 30 112Z"/>
-   </g>
-   <g stroke="@D@" stroke-width="2.6" stroke-linecap="round" fill="none">
-    <path d="M33 89 Q64 81 95 89 M35 104 Q64 98 93 104 M31 112 Q64 106 97 112"/>
-   </g>`,
-  B:`<g fill="@F@" stroke="@S@" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="64" cy="15" r="8"/>
-    <path d="M64 25 C43 35 36 51 38 65 C40 78 49 83 64 84 C79 83 88 77 90 65 C93 51 83 35 64 25Z"/>
-    <path d="M48 82 Q64 78 80 82 L84 94 Q64 99 44 94Z"/>
-    <path d="M43 94 Q64 87 85 94 L90 103 Q64 111 38 103Z"/>
-    <path d="M44 104 Q51 110 64 110 Q77 110 84 104 Q93 109 110 112 Q119 115 119 119 Q107 122 88 117 Q77 114 64 115 Q51 114 40 117 Q20 122 9 119 Q9 115 18 112 Q35 109 44 104Z"/>
-   </g>
-   <path d="M64 43V66 M54 52H74" fill="none" stroke="@D@" stroke-width="5" stroke-linecap="round"/>
-   <path d="M47 91 Q64 86 81 91" fill="none" stroke="@D@" stroke-width="3.3" stroke-linecap="round"/>`,
-  N:`<g fill="@F@" stroke="@S@" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M31 24 L35 11 L44 17 L51 7 L57 17 C75 20 88 29 96 46 C104 62 107 81 107 115 H59 V91 C59 80 66 70 75 61 C66 64 55 70 46 81 C39 89 31 89 25 83 C20 78 22 73 27 66 C29 57 35 48 40 43 C35 41 32 36 31 24Z"/>
-   </g>
-   <path d="M44 36 Q49 31 53 34" fill="none" stroke="@S@" stroke-width="4.5" stroke-linecap="round"/>
-   <path d="M40 57 C43 52 47 50 52 51" fill="none" stroke="@D@" stroke-width="4.7" stroke-linecap="round"/>
-   <circle cx="46" cy="39" r="3.8" fill="@D@"/>
-   <circle cx="29.8" cy="76.5" r="3" fill="@D@"/>
-   <path d="M85 40 Q99 63 99 113" stroke="@D@" stroke-width="3.7" fill="none" stroke-linecap="round"/>
-   <path d="M29 70 Q35 69 39 64" stroke="@S@" stroke-width="3.1" fill="none"/>`,
-  R:`<g fill="@F@" stroke="@S@" stroke-width="4.6" stroke-linejoin="round">
-    <path d="M24 20H38V27H51V20H77V27H90V20H104V42H24Z"/>
-    <path d="M30 42 H98 L90 51 H38Z"/>
-    <path d="M38 51 H90 V91 H38Z"/>
-    <path d="M38 91H90L99 102H29Z"/>
-    <path d="M24 102H104V111H24Z"/>
-    <path d="M18 111H110V119H18Z"/>
-   </g>
-   <path d="M31 38H97 M36 47H92 M31 106H97 M21 115H107" stroke="@D@" stroke-width="2.7" fill="none" stroke-linecap="round"/>`,
-  P:`<g fill="@F@" stroke="@S@" stroke-width="4.5" stroke-linejoin="round">
-    <circle cx="64" cy="30" r="14"/>
-    <path d="M53 42 C46 48 44 53 44 59 C44 65 48 69 54 73 C39 80 32 94 30 115 H98 C96 94 89 80 74 73 C80 69 84 65 84 59 C84 53 82 48 75 42 Z"/>
-    <path d="M48 69 Q64 76 80 69 L78 76 Q64 82 50 76Z"/>
-    <path d="M33 106 Q64 101 95 106 L98 115 H30Z"/>
-   </g>`
- };
- // Four-player palettes and the two-player white/black pieces share one SVG
- // geometry. The fill comes from the selected theme, never from device fonts.
+ const CBURNETT={"bB":"<g id=\"black-bishop\" class=\"black bishop\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2zm6-4c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2zM25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z\" fill=\"#000\" stroke-linecap=\"butt\"/><path d=\"M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5\" stroke=\"#fff\" stroke-linejoin=\"miter\"/></g>","bK":"<g id=\"black-king\" class=\"black king\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22.5 11.63V6\" stroke-linejoin=\"miter\"/><path d=\"M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5\" fill=\"#000\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\"/><path d=\"M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z\" fill=\"#000\"/><path d=\"M20 8h5\" stroke-linejoin=\"miter\"/><path d=\"M32 29.5s8.5-4 6.03-9.65C34.15 14 25 18 22.5 24.5l.01 2.1-.01-2.1C20 18 9.906 14 6.997 19.85c-2.497 5.65 4.853 9 4.853 9M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0\" stroke=\"#fff\"/></g>","bN":"<g id=\"black-knight\" class=\"black knight\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\" style=\"fill:#000000; stroke:#000000;\"/><path d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\" style=\"fill:#000000; stroke:#000000;\"/><path d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\" style=\"fill:#ececec; stroke:#ececec;\"/><path d=\"M 15 15.5 A 0.5 1.5 0 1 1 14,15.5 A 0.5 1.5 0 1 1 15 15.5 z\" transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\" style=\"fill:#ececec; stroke:#ececec;\"/><path d=\"M 24.55,10.4 L 24.1,11.85 L 24.6,12 C 27.75,13 30.25,14.49 32.5,18.75 C 34.75,23.01 35.75,29.06 35.25,39 L 35.2,39.5 L 37.45,39.5 L 37.5,39 C 38,28.94 36.62,22.15 34.25,17.66 C 31.88,13.17 28.46,11.02 25.06,10.5 L 24.55,10.4 z \" style=\"fill:#ececec; stroke:none;\"/></g>","bP":"<g id=\"black-pawn\" class=\"black pawn\"><path d=\"M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z\" fill=\"#000\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></g>","bQ":"<g id=\"black-queen\" class=\"black queen\" fill=\"#000\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><g fill=\"#000\" stroke=\"none\"><circle cx=\"6\" cy=\"12\" r=\"2.75\"/><circle cx=\"14\" cy=\"9\" r=\"2.75\"/><circle cx=\"22.5\" cy=\"8\" r=\"2.75\"/><circle cx=\"31\" cy=\"9\" r=\"2.75\"/><circle cx=\"39\" cy=\"12\" r=\"2.75\"/></g><path d=\"M9 26c8.5-1.5 21-1.5 27 0l2.5-12.5L31 25l-.3-14.1-5.2 13.6-3-14.5-3 14.5-5.2-13.6L14 25 6.5 13.5 9 26zM9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z\" stroke-linecap=\"butt\"/><path d=\"M11 38.5a35 35 1 0 0 23 0\" fill=\"none\" stroke-linecap=\"butt\"/><path d=\"M11 29a35 35 1 0 1 23 0M12.5 31.5h20M11.5 34.5a35 35 1 0 0 22 0M10.5 37.5a35 35 1 0 0 24 0\" fill=\"none\" stroke=\"#fff\"/></g>","bR":"<g id=\"black-rook\" class=\"black rook\" fill=\"#000\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5h-20zM12 36v-4h21v4H12z\" stroke-linecap=\"butt\"/><path d=\"M14 29.5v-13h17v13H14z\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\"/><path d=\"M14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z\" stroke-linecap=\"butt\"/><path d=\"M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1\" stroke-linejoin=\"miter\"/></g>","wB":"<g id=\"white-bishop\" class=\"white bishop\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><g fill=\"#fff\" stroke-linecap=\"butt\"><path d=\"M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2zM15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2zM25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z\"/></g><path d=\"M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5\" stroke-linejoin=\"miter\"/></g>","wK":"<g id=\"white-king\" class=\"white king\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22.5 11.63V6M20 8h5\" stroke-linejoin=\"miter\"/><path d=\"M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5\" fill=\"#fff\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\"/><path d=\"M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z\" fill=\"#fff\"/><path d=\"M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0\"/></g>","wN":"<g id=\"white-knight\" class=\"white knight\" fill=\"none\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18\" style=\"fill:#ffffff; stroke:#000000;\"/><path d=\"M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10\" style=\"fill:#ffffff; stroke:#000000;\"/><path d=\"M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z\" style=\"fill:#000000; stroke:#000000;\"/><path d=\"M 15 15.5 A 0.5 1.5 0 1 1 14,15.5 A 0.5 1.5 0 1 1 15 15.5 z\" transform=\"matrix(0.866,0.5,-0.5,0.866,9.693,-5.173)\" style=\"fill:#000000; stroke:#000000;\"/></g>","wP":"<g id=\"white-pawn\" class=\"white pawn\"><path d=\"M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z\" fill=\"#fff\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></g>","wQ":"<g id=\"white-queen\" class=\"white queen\" fill=\"#fff\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM24.5 7.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0zM33 9a2 2 0 1 1-4 0 2 2 0 1 1 4 0z\"/><path d=\"M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12zM9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z\" stroke-linecap=\"butt\"/><path d=\"M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0\" fill=\"none\"/></g>","wR":"<g id=\"white-rook\" class=\"white rook\" fill=\"#fff\" fill-rule=\"evenodd\" stroke=\"#000\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5\" stroke-linecap=\"butt\"/><path d=\"M34 14l-3 3H14l-3-3\"/><path d=\"M31 17v12.5H14V17\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\"/><path d=\"M31 29.5l1.5 2.5h-20l1.5-2.5\"/><path d=\"M11 14h23\" fill=\"none\" stroke-linejoin=\"miter\"/></g>"};
+
+ // Authentic 2006 Colin M.L. Burnett artwork from Wikimedia Commons.
+ // Copy and adapt under the author's BSD 3-Clause license; see CBURNETT_LICENSE.txt.
+ // Exact same SVG nodes are shipped in assets/classic-figures/*.svg.
  function classicSVG(kind,paint='#ffffff'){
-  const hex=/^#[0-9a-f]{6}$/i.test(paint)?paint.toLowerCase():'#ffffff';
-  const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
-  const lin=rgb.map(c=>c<=0.04045?c/12.92:((c+0.055)/1.055)**2.4);
-  const luminance=.2126*lin[0]+.7152*lin[1]+.0722*lin[2];
-  // Thin details in white/light on dark chessmen, black on light chessmen.
-  const dark=luminance<.28;
-  const detail=dark?'#ffffff':'#151515';
-  const contour='#111111';
-  const body=(classicShapes[kind]||classicShapes.P)
-   .replaceAll('@F@',hex).replaceAll('@S@',contour).replaceAll('@D@',detail);
-  return `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">${body}</svg>`;
+   const hex=/^#[0-9a-f]{6}$/i.test(paint)?paint.toLowerCase():'#ffffff';
+   const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
+   const luminance=rgb.reduce((a,c,i)=>a+[.2126,.7152,.0722][i]*(c<=.04045?c/12.92:((c+.055)/1.055)**2.4),0);
+   const dark=luminance<.28;
+   const key=(dark?'b':'w')+kind;
+   const frag=CBURNETT[key]||CBURNETT[(dark?'b':'w')+'P'];
+   if(!frag)return '';
+   // Honor four-player palette without losing internal engravings and contours.
+   let art=frag;
+   if(dark && hex!=='#101010' && hex!=='#000000'){
+     art=art.replace(/#000000|#000(?![0-9a-f])/gi,hex);
+   } else if(!dark && hex!=='#ffffff'){
+     art=art.replace(/#ffffff|#fff(?![0-9a-f])/gi,hex);
+   }
+   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" aria-hidden="true" focusable="false">${art}</svg>`;
  }
  const base={
   R:`<path d="M13 53h38l-4-9H17zM18 16h8v8h12v-8h8v22l-4 6H22l-4-6zM13 13h11v10H13zm15 0h9v10h-9zm13 0h11v10H41z"/><rect x="28" y="32" width="8" height="12" rx="3" fill="#172434" opacity=".8"/>`,
