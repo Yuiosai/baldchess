@@ -47,8 +47,10 @@ const ChessGame=(()=>{
   const state=room.state,myTurn=controlled(state.turn),canQueue=state.options.premoves&&state.active[room.role];
   if(!myTurn&&!canQueue)return;
   const piece=state.board[r]?.[c];
-  // Selecting the same source again cancels a queued premove, then allows a new one.
-  if(premove&&premove.from[0]===r&&premove.from[1]===c){
+  // A click on ANY of the player's own active pieces cancels an existing premove.
+  // Continue processing the click so the player may immediately select a new source.
+  // Never cancel on an enemy/empty destination (important for selecting premove targets).
+  if(premove&&piece&&piece.color===room.role&&state.active[piece.color]){
    premove=null;selectionEpoch++;selected=null;moves=[];notify();
   }
   if(selected&&moves.some(([x,y])=>x===r&&y===c)){

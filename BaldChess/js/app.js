@@ -9,7 +9,9 @@
  };
  Object.assign(LANG.en,{welcomeMotto:'YOUR BOARD. YOUR RULES.',online:'ONLINE',backToGame:'Back to current game',copyCode:'Copy room code',team:'Team',joinHint:'Use this room code to connect.',invalidSkin:'Invalid skin',player:'Player',second:'sec',teamsHeader:'TEAMS · 4 PLAYERS',freeForAllHeader:'FREE FOR ALL · 4 PLAYERS',footer:'ONLINE · CHESS',sendInvite:'Invite link copied',seatTop:'Top',seatBottom:'Bottom',seatLeft:'Left',seatRight:'Right'});
  Object.assign(LANG.ru,{welcomeMotto:'ТВОЯ ДОСКА. ТВОИ ПРАВИЛА.',online:'В СЕТИ',backToGame:'Вернуться к текущей партии',copyCode:'Скопировать код комнаты',team:'Команда',joinHint:'Используй этот код для входа.',invalidSkin:'Неверный скин',player:'Игрок',second:'сек',teamsHeader:'КОМАНДЫ · 4 ИГРОКА',freeForAllHeader:'FREE FOR ALL · 4 ИГРОКА',footer:'СЕТЕВЫЕ ШАХМАТЫ',sendInvite:'Ссылка-приглашение скопирована',seatTop:'Верх',seatBottom:'Низ',seatLeft:'Слева',seatRight:'Справа'});
- Object.assign(LANG.en,{playSounds:'Move sounds'});
+ Object.assign(LANG.en,{welcomeSeo:'Free online chess for 2 or 4 players — private rooms, no registration.'});
+Object.assign(LANG.ru,{welcomeSeo:'Шахматы для 4 игроков онлайн и 1 на 1 — играй с друзьями без регистрации.'});
+Object.assign(LANG.en,{playSounds:'Move sounds'});
  Object.assign(LANG.ru,{playSounds:'Звуки ходов'});
  Object.assign(LANG.en,{undoMove:'↶ Undo move',newGameSettings:'New game settings',startConfigured:'Start a new game',gameModeSetting:'Game mode',confirmConfigured:'Start a new game with these settings? This will replace the current game.'});
  Object.assign(LANG.ru,{undoMove:'↶ Отменить ход',newGameSettings:'Настройки новой партии',startConfigured:'Начать новую партию',gameModeSetting:'Режим игры',confirmConfigured:'Начать новую партию с этими настройками? Текущая партия будет заменена.'});
